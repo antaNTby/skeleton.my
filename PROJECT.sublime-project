@@ -1,0 +1,48 @@
+{
+    "folders": [
+    {
+        "path": ".",
+        "name": "skeleton.my",
+
+        "file_exclude_patterns": [
+            //
+            "*.sublime-*",
+            "*.git*",
+            "favicon.ico",
+            ".htaccess",
+            "composer.lock",
+            "public/lib/bootstrap/css/*",
+            "public/lib/bootstrap/js/*",
+            "public/lib/bootstrap-icons/font/*",
+            "public/lib/bootstrap-icons/icons/*"
+
+
+        ],
+        "folder_exclude_patterns": [
+            //
+            // ".osp",
+            // "sessions",
+            // "smarty",
+            // "trash",
+            // "vendor",
+            // "compile_dir",
+            // "smarty_cache"
+        ]
+    }],
+    "settings":
+    {
+
+
+        "remember_open_files": true,
+        "default_encoding": "UTF-8",
+        "fallback_encoding": "UTF-8",
+
+        "color_scheme": "Monokai Pro (Filter Machine).sublime-color-scheme",
+        // "color_scheme": "Dark Knight.sublime-color-scheme",
+        // "color_scheme": "Packages/Visual Studio Dark/Visual Studio Dark.tmTheme",
+        "tab_size": 4,
+        "translate_tabs_to_spaces": true,
+        "trim_trailing_white_space_on_save": true,
+        "ensure_newline_at_eof_on_save": true
+    }
+}
