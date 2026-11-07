@@ -14,3 +14,30 @@
 /phpunit.xml
 /coverage/
 /clover.xml
+
+
+*.sublime-workspace
+
+vendor/
+node_modules/
+
+**/smarty/
+**/logs/
+
+**/sessions/
+
+
+**/public/lib/bootstrap/
+**/public/lib/bootstrap-icons/
+
+# **/smarty/compile_dir/
+# **/smarty/cache_dir/
+# **/smarty/smarty_cache/
+
+# **/logs/
+
+
+# **/app/sessions/
+
+# monolog.log
+# monolog.backup
