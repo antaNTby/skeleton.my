@@ -1,0 +1,14 @@
+{extends file='layout.tpl.html'}
+
+{block name='title'}{$company->title} — FlightPHP Skeleton{/block}
+
+{block name='body'}
+<div class="card">
+    <p class="muted"><a href="{$base_url}companies">← All companies</a></p>
+    <h1>{$company->title}</h1>
+    <p>{$company->content}</p>
+    {if !empty($company->created_at)}
+        <p class="muted">Created {$company->created_at}</p>
+    {/if}
+</div>
+{/block}

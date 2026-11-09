@@ -28,7 +28,9 @@ $router->group( '', function ( Router $router ) use ( $config ) {
 
         $router->group( '/api', function ( Router $router ) {
             $router->get( '/posts', [PostController::class, 'apiIndex'] );
-            $router->get( '/posts/@id:[0-9]+', [PostController::class, 'apiShow'] );
+            $router->get( '/posts', [PostController::class, 'apiIndex'] );
+            $router->get( '/companies/@id:[0-9]+', [CompanyController::class, 'apiShow'] );
+            $router->get( '/companies/@id:[0-9]+', [CompanyController::class, 'apiShow'] );
         } );
     }
 }, [SecurityHeadersMiddleware::class] );

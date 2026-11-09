@@ -1,0 +1,22 @@
+{extends file='layout.tpl.html'}
+
+{block name='title'}Companies — FlightPHP Skeleton{/block}
+
+{block name='body'}
+<div class="card">
+    <h1>Companies</h1>
+    <p class="muted">Loaded via ActiveRecord from SimplePdo (run <code>php runway migrate</code> if empty).</p>
+    {if empty($companies)}
+        <p>No companies yet.</p>
+    {else}
+        <ul class="companies">
+            {foreach $companies as $company}
+                <li>
+                    <a href="{$base_url}companies/{$company->id}"><strong>{$company->full_name}</strong></a>
+                    <div class="muted">#{$company->id}{if !empty($company->created_at)} · {$company->created_at} {$company->name}{/if}</div>
+                </li>
+            {/foreach}
+        </ul>
+    {/if}
+</div>
+{/block}

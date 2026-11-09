@@ -21,6 +21,7 @@ use flight\database\SimplePdo;
 use flight\debug\tracy\TracyExtensionLoader;
 use flight\Engine;
 use flight\Session;
+use Smarty\Smarty;
 use Tracy\Debugger;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -96,6 +97,61 @@ $app->map( 'render', function (
 } );
 
 // ---------------------------------------------------------------------------
+// Smarty
+// ---------------------------------------------------------------------------
+
+$templateDir = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'templates' );
+$compileDir  = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'app/cache/smarty/compile_dir' );
+$cacheDir    = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'app/cache/smarty/cache_dir' );
+$configDir   = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'app/config/smarty_config_dir' );
+
+// Проверяем и создаём необходимые директории
+$directories = [$templateDir, $compileDir, $cacheDir, $configDir];
+foreach ( $directories as $directory ) {
+    if ( !is_dir( $directory ) ) {
+        if (
+            !mkdir( $directory, 0775, true )
+            && !is_dir( $directory )
+        ) {
+            throw new RuntimeException(
+                "Unable to create directory: {$directory}"
+            );
+        }
+    }
+
+}
+
+$smarty = new Smarty();
+
+// Настройка путей Smarty 5
+$smarty->setTemplateDir( $templateDir );
+$smarty->setCompileDir( $compileDir );
+$smarty->setCacheDir( $cacheDir );
+$smarty->setConfigDir( $configDir );
+
+$smarty->compile_id = 'skeleton_';
+
+$smarty->assign( 'csp_nonce', $nonce );
+$smarty->assign( 'app_env', $config->env() );
+// Always trailing slash so {{ base_url }}posts joins correctly under subpaths
+$smarty->assign( 'base_url', $config->baseUrl() );
+
+// Map Flight render → Twig (single documented view path)
+$app->map( 'renderSmarty', function (
+    string $template,
+    array  $data = []
+) use ( $app, $smarty ) {
+    // Allow "welcome" or "welcome.tpl.html"
+    if ( substr( $template, -9 ) !== '.tpl.html' ) {
+        $template .= '.tpl.html';
+    }
+
+    $smarty->assign( $data );
+    // $smarty->fetch( $template );
+    $app->response()->write( $smarty->fetch( $template ) );
+} );
+
+// ---------------------------------------------------------------------------
 // Session (flightphp/session)
 // ---------------------------------------------------------------------------
 $sessionOptions = [
@@ -122,6 +178,7 @@ $substitutions = [
     Engine::class      => $app,
     Config::class      => $config,
     Environment::class => $twig,
+    Smarty::class      => $smarty,
     Session::class     => $session,
 ];
 
@@ -136,6 +193,7 @@ $container = $container->addRule( '*', [
 // Shared rules for classes resolved by name (belt + suspenders)
 $container = $container->addRule( Config::class, ['shared' => true] );
 $container = $container->addRule( Environment::class, ['shared' => true] );
+$container = $container->addRule( Smarty::class, ['shared' => true] );
 $container = $container->addRule( Session::class, ['shared' => true] );
 if ( $db instanceof SimplePdo ) {
     $container = $container->addRule( SimplePdo::class, ['shared' => true] );
@@ -147,6 +205,8 @@ $app->registerContainerHandler( function (
 ) use ( $container ) {
     return $container->create( $class, $params );
 } );
+
+// dd( $container );
 
 // Helper for non-route code: $app->make(SomeClass::class)
 $app->map( 'make', function (

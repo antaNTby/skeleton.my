@@ -10,7 +10,7 @@ use flight\Engine;
 
 /**
  * Example CRUD-ish controller using ActiveRecord + SimplePdo.
- * Run `php runway migrate` first so the posts table exists.
+ * Run `php runway migrate` first so the companies table exists.
  */
 class CompanyController
 {
@@ -33,11 +33,11 @@ class CompanyController
 
     public function index(): void
     {
-        $post  = new Company( $this->db );
-        $posts = $post->orderByColumn( 'id', 'DESC' )->findAll();
+        $company   = new Company( $this->db );
+        $companies = $company->orderByColumn( 'id', 'DESC' )->findAll();
 
-        $this->app->render( 'posts/index', [
-            'posts' => $posts,
+        $this->app->renderSmarty( 'companies/index', [
+            'companies' => $companies,
         ] );
     }
 
@@ -46,27 +46,27 @@ class CompanyController
      */
     public function show( $id ): void
     {
-        $post = new Company( $this->db );
-        $post->find( (int) $id );
+        $company = new Company( $this->db );
+        $company->find( (int) $id );
 
-        if ( !$post->isHydrated() ) {
+        if ( !$company->isHydrated() ) {
             $this->app->halt( 404, 'Company not found' );
 
             return;
         }
 
-        $this->app->render( 'posts/show', [
-            'post' => $post,
+        $this->app->renderSmarty( 'companies/show', [
+            'company' => $company,
         ] );
     }
 
     public function apiIndex(): void
     {
-        $post  = new Company( $this->db );
-        $posts = $post->orderByColumn( 'id', 'DESC' )->findAll();
+        $company   = new Company( $this->db );
+        $companies = $company->orderByColumn( 'id', 'DESC' )->findAll();
 
         $data = [];
-        foreach ( $posts as $row ) {
+        foreach ( $companies as $row ) {
             // findAll() is typed as ActiveRecord[]; narrow to Company for @property fields
             if ( !$row instanceof Company ) {
                 continue;
@@ -87,20 +87,20 @@ class CompanyController
      */
     public function apiShow( $id ): void
     {
-        $post = new Company( $this->db );
-        $post->find( (int) $id );
+        $company = new Company( $this->db );
+        $company->find( (int) $id );
 
-        if ( !$post->isHydrated() ) {
+        if ( !$company->isHydrated() ) {
             $this->app->json( ['error' => 'Company not found'], 404 );
 
             return;
         }
 
         $this->app->json( [
-            'id'         => $post->id,
-            'title'      => $post->title,
-            'content'    => $post->content,
-            'created_at' => $post->created_at,
+            'id'         => $company->id,
+            'title'      => $company->title,
+            'content'    => $company->content,
+            'created_at' => $company->created_at,
         ], 200, true, 'utf-8', JSON_PRETTY_PRINT );
     }
 }
