@@ -31,7 +31,6 @@
         "flightphp/session": "^0.3",
         "level-2/dice": "^4.0",
         "tracy/tracy": "^2.9",
-        "twig/twig": "^2.15 || ^3.0",
         "smarty/smarty": "^5.0",
         "twbs/bootstrap": "^5.3.8",
         "twbs/bootstrap-icons": "^1.13",

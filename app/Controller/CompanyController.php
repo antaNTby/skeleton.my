@@ -34,7 +34,7 @@ class CompanyController
     public function index(): void
     {
         $company   = new Company( $this->db );
-        $companies = $company->orderByColumn( 'id', 'DESC' )->findAll();
+        $companies = $company->orderByColumn( 'id', 'ASC' )->findAll();
 
         $this->app->renderSmarty( 'companies/index', [
             'companies' => $companies,
@@ -63,7 +63,7 @@ class CompanyController
     public function apiIndex(): void
     {
         $company   = new Company( $this->db );
-        $companies = $company->orderByColumn( 'id', 'DESC' )->findAll();
+        $companies = $company->orderByColumn( 'id', 'ASC' )->findAll();
 
         $data = [];
         foreach ( $companies as $row ) {
@@ -72,10 +72,10 @@ class CompanyController
                 continue;
             }
             $data[] = [
-                'id'         => $row->id,
-                'title'      => $row->title,
-                'content'    => $row->content,
-                'created_at' => $row->created_at,
+                'id'            => $row->id,
+                'name'          => $row->name,
+                'legal_address' => $row->legal_address,
+                'created_at'    => $row->created_at,
             ];
         }
 
@@ -97,10 +97,10 @@ class CompanyController
         }
 
         $this->app->json( [
-            'id'         => $company->id,
-            'title'      => $company->title,
-            'content'    => $company->content,
-            'created_at' => $company->created_at,
+            'id'            => $company->id,
+            'name'          => $company->name,
+            'legal_address' => $company->legal_address,
+            'created_at'    => $company->created_at,
         ], 200, true, 'utf-8', JSON_PRETTY_PRINT );
     }
 }

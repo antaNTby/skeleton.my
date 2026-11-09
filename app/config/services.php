@@ -66,35 +66,35 @@ if ( DatabaseFactory::isEnabled( $config ) ) {
 // ---------------------------------------------------------------------------
 // Twig
 // ---------------------------------------------------------------------------
-$viewsPath = $projectRoot . $ds . 'app' . $ds . 'views';
-$twigCache = $projectRoot . $ds . 'app' . $ds . 'cache' . $ds . 'twig';
-if ( !is_dir( $twigCache ) ) {
-    mkdir( $twigCache, 0775, true );
-}
-
-$loader = new FilesystemLoader( $viewsPath );
-$twig   = new Environment( $loader, [
-    'cache'       => $config->isDebug() ? false : $twigCache,
-    'debug'       => $config->isDebug(),
-    'auto_reload' => $config->isDebug(),
-] );
-
-$twig->addGlobal( 'csp_nonce', $nonce );
-$twig->addGlobal( 'app_env', $config->env() );
-// Always trailing slash so {{ base_url }}posts joins correctly under subpaths
-$twig->addGlobal( 'base_url', $config->baseUrl() );
-
-// Map Flight render → Twig (single documented view path)
-$app->map( 'render', function (
-    string $template,
-    array  $data = []
-) use ( $app, $twig ) {
-    // Allow "welcome" or "welcome.twig"
-    if ( substr( $template, -5 ) !== '.twig' ) {
-        $template .= '.twig';
-    }
-    $app->response()->write( $twig->render( $template, $data ) );
-} );
+#####  $viewsPath = $projectRoot . $ds . 'app' . $ds . 'views';
+#####  $twigCache = $projectRoot . $ds . 'app' . $ds . 'cache' . $ds . 'twig';
+#####  if ( !is_dir( $twigCache ) ) {
+#####      mkdir( $twigCache, 0775, true );
+#####  }
+#####
+#####  $loader = new FilesystemLoader( $viewsPath );
+#####  $twig   = new Environment( $loader, [
+#####      'cache'       => $config->isDebug() ? false : $twigCache,
+#####      'debug'       => $config->isDebug(),
+#####      'auto_reload' => $config->isDebug(),
+#####  ] );
+#####
+#####  $twig->addGlobal( 'csp_nonce', $nonce );
+#####  $twig->addGlobal( 'app_env', $config->env() );
+#####  // Always trailing slash so {{ base_url }}posts joins correctly under subpaths
+#####  $twig->addGlobal( 'base_url', $config->baseUrl() );
+#####
+#####  // Map Flight render → Twig (single documented view path)
+#####  $app->map( 'render', function (
+#####      string $template,
+#####      array  $data = []
+#####  ) use ( $app, $twig ) {
+#####      // Allow "welcome" or "welcome.twig"
+#####      if ( substr( $template, -5 ) !== '.twig' ) {
+#####          $template .= '.twig';
+#####      }
+#####      $app->response()->write( $twig->render( $template, $data ) );
+#####  } );
 
 // ---------------------------------------------------------------------------
 // Smarty
@@ -175,11 +175,11 @@ $container = new Dice();
 
 // Critical: reuse the same Engine instance; do not construct a new one
 $substitutions = [
-    Engine::class      => $app,
-    Config::class      => $config,
-    Environment::class => $twig,
-    Smarty::class      => $smarty,
-    Session::class     => $session,
+    Engine::class  => $app,
+    Config::class  => $config,
+    // Environment::class => $twig,
+    Smarty::class  => $smarty,
+    Session::class => $session,
 ];
 
 if ( $db instanceof SimplePdo ) {
