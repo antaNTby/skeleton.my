@@ -12,33 +12,45 @@
  * Side effects (timezone, error_reporting, flight.* settings) live in
  * bootstrap.php so Runway only rewrites the data block.
  */
+
 return [
-    'app' => [
-        'env' => 'development',
-        'debug' => true,
+    'app'             => [
+        'env'      => 'development',
+        'debug'    => true,
         // Trailing slash is normalized at runtime (Config::baseUrl()).
         // Use '/' for app root, or a subpath like '/myapp' / '/myapp/'.
         'base_url' => '/',
         'timezone' => 'UTC',
     ],
-    'database' => [
+    'database'        => [
         // sqlite (default — works after create-project with no MySQL)
         // or mysql. Empty string disables DB registration and post/demo routes.
-        'driver' => 'sqlite',
-        'host' => 'localhost',
-        'dbname' => '',
-        'user' => '',
-        'password' => '',
-        'file_path' => __DIR__ . '/../../database.sqlite',
-        'charset' => 'utf8mb4',
+        'driver'   => 'mysql',
+        'host'     => 'MySql-8.4',
+        'dbname'   => 'newDB',
+        'user'     => 'antaNT64',
+        'password' => 'root',
+        // 'file_path' => __DIR__ . '/../../database.sqlite',
+        'charset'  => 'utf8mb4',
     ],
-    'session' => [
-        'prefix' => 'flight_sess_',
+    'database_sqlite' => [
+        // sqlite (default — works after create-project with no MySQL)
+        // or mysql. Empty string disables DB registration and post/demo routes.
+        'driver'    => 'sqlite',
+        'host'      => 'localhost',
+        'dbname'    => '',
+        'user'      => '',
+        'password'  => '',
+        'file_path' => __DIR__ . '/../../database.sqlite',
+        'charset'   => 'utf8mb4',
+    ],
+    'session'         => [
+        'prefix'    => 'flight_sess_',
         // null = system temp /flight_sessions (see flightphp/session docs)
         'save_path' => null,
     ],
-    'runway' => [
+    'runway'          => [
         'index_root' => 'public/index.php',
-        'app_root' => 'app/',
+        'app_root'   => 'app/',
     ],
 ];
