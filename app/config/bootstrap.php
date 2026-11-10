@@ -45,7 +45,7 @@ $merged = Config::mergeEnv( $fileConfig, $_ENV );
 $config = new Config( $merged );
 
 // Side effects from config (not inside the return array)
-$timezone = (string) $config->get( 'app.timezone', 'UTC' );
+$timezone = (string) $config->get( 'app.timezone', 'UTC+3' );
 if ( $timezone !== '' ) {
     date_default_timezone_set( $timezone );
 }
@@ -62,8 +62,8 @@ $app->set( 'flight.case_sensitive', false );
 $app->set( 'flight.log_errors', true );
 // Let Tracy handle errors when debug is on
 $app->set( 'flight.handle_errors', $config->isDebug() === false );
-$app->set( 'flight.views.path', __DIR__ . $ds . '..' . $ds . 'views' );
-$app->set( 'flight.views.extension', '.twig' );
+$app->set( 'flight.views.path', __DIR__ . $ds . 'templates' );
+$app->set( 'flight.views.extension', '.tpl.html' );
 $app->set( 'flight.content_length', false );
 // Harden: do not allow X-HTTP-Method-Override / _method spoofing unless you need it
 $app->set( 'flight.allow_method_override', false );

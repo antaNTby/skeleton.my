@@ -2,32 +2,50 @@
     "folders": [
     {
         "path": ".",
-        "name": "skeleton.my",
+        "name": "ant.skeleton.my",
 
         "file_exclude_patterns": [
             //
+            ".osp",
             "*.sublime-*",
             "*.git*",
             "favicon.ico",
             ".htaccess",
             "composer.lock",
-            "public/lib/bootstrap/css/*",
-            "public/lib/bootstrap/js/*",
-            "public/lib/bootstrap-icons/font/*",
-            "public/lib/bootstrap-icons/icons/*"
+            ".env*",
+            ".runway-config.json",
+            "config_sample.php",
+
+            "Vagrantfile",
+            "database.sqlite",
+            "docker-compose.yml",
+            "phpstan.neon.dist",
+            "phpunit.xml.dist",
+
+            "runway",
+            "LICENSE",
 
 
-            ],
-        /*"folder_exclude_patterns": [
-            //
-            // ".osp",
-            // "sessions",
+        ],
+
+        "folder_exclude_patterns": [
+
+            "vendor",
+            "sessions",
+
+            "public/lib/bootstrap/css",
+            "public/lib/bootstrap/js",
+            "public/lib/bootstrap-icons/font",
+            "public/lib/bootstrap-icons/icons",
             // "smarty",
-            // "trash",
-            // "vendor",
-            // "compile_dir",
-            // "smarty_cache"
-        ]*/
+            "trash",
+            "compile_dir",
+            "smarty_cache",
+            "tests",
+            "migrations",
+            "app/views"
+        ]
+
     }],
     "settings":
     {
