@@ -21,6 +21,8 @@ use flight\Container;
 use flight\database\SimplePdo;
 use flight\debug\tracy\TracyExtensionLoader;
 use flight\Engine;
+use flight\net\Request;
+use flight\net\Route;
 use flight\Session;
 use Smarty\Smarty;
 use Tracy\Debugger;
@@ -233,6 +235,10 @@ if ( $db instanceof SimplePdo ) {
     $container->singleton( SimplePdo::class, $db );
 }
 
+$container->set( Route::class, function () use ( $app ) {
+    return $app->router()->route( $app->request() );
+} );
+
 // Регистрируем обработчик контейнера в Flight
 $app->registerContainerHandler( function (
     $class,
@@ -249,3 +255,5 @@ $app->map( 'make', function (
 ) use ( $container ) {
     return $container->get( $class, $params );
 } );
+
+bdump( $container );

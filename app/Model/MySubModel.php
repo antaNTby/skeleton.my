@@ -17,19 +17,14 @@ use flight\ActiveRecord;
  *
  * @link https://docs.flightphp.com/awesome-plugins/active-record
  */
+
 class MySubModel extends ActiveRecord
 {
-    public string $table_name
-    = 'unknown_table';
-    /**
-     * @param mixed $databaseConnection PDO / SimplePdo / mysqli connection
-     */
     public function __construct(
                $databaseConnection,
         string $table_name
-
     ) {
-        $this->table_name = $table_name;
-        parent::__construct( $databaseConnection, $this->table_name );
+        // Передаем имя таблицы в массиве конфигурации вторым аргументом
+        parent::__construct( $databaseConnection, $table_name );
     }
 }

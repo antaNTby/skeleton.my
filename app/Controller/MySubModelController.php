@@ -7,6 +7,8 @@ namespace App\Controller;
 use App\Model\MySubModel;
 use flight\database\SimplePdo;
 use flight\Engine;
+use flight\net\Request;
+use flight\net\Route;
 
 /**
  * Example CRUD-ish controller using ActiveRecord + SimplePdo.
@@ -20,31 +22,34 @@ class MySubModelController
     /** @var SimplePdo */
     private $db;
 
-    public string $table_name = 'unknown_table_name';
+    public string $tableName = 'unknown_table_name';
     /**
      * @param Engine<object> $app
      */
     public function __construct(
         Engine    $app,
         SimplePdo $db,
-        string    $table_name
+        Route     $route // <-- Добавили получение роута из контейнера
 
     ) {
-        $this->app        = $app;
-        $this->db         = $db;
-        $this->table_name = $table_name;
+        $this->app       = $app;
+        $this->db        = $db;
+        $this->tableName = $route->params['table_name'] ?? '';
 
         // Здесь ваш код
-        bdump( 'Вы запросили таблицу: ' . htmlspecialchars( $table_name ) );
+        bdump( 'Вы запросили таблицу: ' . htmlspecialchars( $this->tableName ) );
     }
 
     public function index(): void
     {
-        $mySub = new MySubModel( $this->db, $this->table_name
-        );
-        $rows = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
+        $mySub = new MySubModel( $this->db, $this->tableName );
 
-        $this->app->renderSmarty( $this->table_name . '/index', ['rows' => $rows] );
+        $rows = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
+        dd( $rows );
+
+        bdump( 'Список из таблицы: ' . htmlspecialchars( $this->tableName ), 'INDEX' );
+
+        $this->app->renderSmarty( $this->tableName . '/index', ['rows' => $rows] );
     }
 
     /**
@@ -52,7 +57,7 @@ class MySubModelController
      */
     public function show( $id ): void
     {
-        $mySub = new MySubModel( $this->db, $this->table_name );
+        $mySub = new MySubModel( $this->db, $this->tableName );
         $mySub->find( (int) $id );
 
         if ( !$mySub->isHydrated() ) {
@@ -61,12 +66,12 @@ class MySubModelController
             return;
         }
 
-        $this->app->renderSmarty( $this->table_name . '/show', ['mySub' => $mySub] );
+        $this->app->renderSmarty( $this->tableName . '/show', ['mySub' => $mySub] );
     }
 
     public function apiIndex(): void
     {
-        $mySub = new MySubModel( $this->db, $this->table_name );
+        $mySub = new MySubModel( $this->db, $this->tableName );
         $rows  = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
 
         $data = [];
@@ -91,7 +96,7 @@ class MySubModelController
      */
     public function apiShow( $id ): void
     {
-        $mySub = new MySubModel( $this->db, $this->table_name
+        $mySub = new MySubModel( $this->db, $this->tableName
         );
         $mySub->find( (int) $id );
 
