@@ -20,8 +20,7 @@ class MySubModelController
     /** @var SimplePdo */
     private $db;
 
-    public string $table_name
-    = 'unknown_table';
+    public string $table_name = 'unknown_table_name';
     /**
      * @param Engine<object> $app
      */
@@ -31,8 +30,12 @@ class MySubModelController
         string    $table_name
 
     ) {
-        $this->app = $app;
-        $this->db  = $db;
+        $this->app        = $app;
+        $this->db         = $db;
+        $this->table_name = $table_name;
+
+        // Здесь ваш код
+        bdump( 'Вы запросили таблицу: ' . htmlspecialchars( $table_name ) );
     }
 
     public function index(): void

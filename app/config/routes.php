@@ -21,6 +21,7 @@ $router->group( '', function ( Router $router ) use ( $config ) {
 
     // Posts demo requires SimplePdo (PostController). Skip when DB is disabled.
     if ( DatabaseFactory::isEnabled( $config ) ) {
+
         $router->get( '/MySub/@table_name', [MySubModelController::class, 'index'] );
         $router->get( '/MySub/@table_name/@id:[0-9]+', [MySubModelController::class, 'show'] );
 
