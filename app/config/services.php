@@ -17,6 +17,7 @@
 use App\Utils\Config;
 use App\Utils\DatabaseFactory;
 use Dice\Dice;
+use flight\Container;
 use flight\database\SimplePdo;
 use flight\debug\tracy\TracyExtensionLoader;
 use flight\Engine;
@@ -171,47 +172,80 @@ $session = new Session( $sessionOptions );
 // ---------------------------------------------------------------------------
 // Dice + Engine substitutions (required — see Flight DI docs)
 // ---------------------------------------------------------------------------
-$container = new Dice();
+#####  $container = new Dice();
+#####
+#####  // Critical: reuse the same Engine instance; do not construct a new one
+#####  $substitutions = [
+#####      Engine::class  => $app,
+#####      Config::class  => $config,
+#####      // Environment::class => $twig,
+#####      Smarty::class  => $smarty,
+#####      Session::class => $session,
+#####  ];
+#####
+#####  if ( $db instanceof SimplePdo ) {
+#####      $substitutions[SimplePdo::class] = $db;
+#####  }
+#####
+#####  $container = $container->addRule( '*', [
+#####      'substitutions' => $substitutions,
+#####  ] );
+#####
+#####  // Shared rules for classes resolved by name (belt + suspenders)
+#####  $container = $container->addRule( Config::class, ['shared' => true] );
+#####  // $container = $container->addRule( Environment::class, ['shared' => true] );
+#####  $container = $container->addRule( Smarty::class, ['shared' => true] );
+#####  $container = $container->addRule( Session::class, ['shared' => true] );
+#####  if ( $db instanceof SimplePdo ) {
+#####      $container = $container->addRule( SimplePdo::class, ['shared' => true] );
+#####  }
+#####
+#####  $app->registerContainerHandler( function (
+#####      $class,
+#####      $params
+#####  ) use ( $container ) {
+#####      return $container->create( $class, $params );
+#####  } );
+#####
+#####  // dd( $container );
+#####
+#####  // Helper for non-route code: $app->make(SomeClass::class)
+#####  $app->map( 'make', function (
+#####      $class,
+#####      $params = []
+#####  ) use ( $container ) {
+#####      return $container->create( $class, $params );
+#####  } );
 
-// Critical: reuse the same Engine instance; do not construct a new one
-$substitutions = [
-    Engine::class  => $app,
-    Config::class  => $config,
-    // Environment::class => $twig,
-    Smarty::class  => $smarty,
-    Session::class => $session,
-];
+// ---------------------------------------------------------------------------
+// flight\Container + Engine dependencies
+// ---------------------------------------------------------------------------
+// Создаем экземпляр встроенного контейнера Flight
+$container = new \flight\Container();
+
+// Регистрируем общие экземпляры (Singletons / Shared), которые мы уже создали
+$container->singleton( Engine::class, $app );
+$container->singleton( Config::class, $config );
+$container->singleton( Smarty::class, $smarty );
+$container->singleton( Session::class, $session );
 
 if ( $db instanceof SimplePdo ) {
-    $substitutions[SimplePdo::class] = $db;
+    $container->singleton( SimplePdo::class, $db );
 }
 
-$container = $container->addRule( '*', [
-    'substitutions' => $substitutions,
-] );
-
-// Shared rules for classes resolved by name (belt + suspenders)
-$container = $container->addRule( Config::class, ['shared' => true] );
-// $container = $container->addRule( Environment::class, ['shared' => true] );
-$container = $container->addRule( Smarty::class, ['shared' => true] );
-$container = $container->addRule( Session::class, ['shared' => true] );
-if ( $db instanceof SimplePdo ) {
-    $container = $container->addRule( SimplePdo::class, ['shared' => true] );
-}
-
+// Регистрируем обработчик контейнера в Flight
 $app->registerContainerHandler( function (
     $class,
     $params
 ) use ( $container ) {
-    return $container->create( $class, $params );
+    // Встроенный контейнер Flight принимает параметры в метод get() вторым аргументом
+    return $container->get( $class, $params );
 } );
 
-// dd( $container );
-
-// Helper for non-route code: $app->make(SomeClass::class)
+// Помощник для кода вне роутов: $app->make(SomeClass::class)
 $app->map( 'make', function (
     $class,
     $params = []
 ) use ( $container ) {
-    return $container->create( $class, $params );
+    return $container->get( $class, $params );
 } );

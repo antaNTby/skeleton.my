@@ -25,19 +25,18 @@
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
         "ext-pdo": "*",
+        "flightphp/active-record": "^0.7",
+        "flightphp/cache": "^1.1",
+        "flightphp/container": "^1.3",
         "flightphp/core": "^3.19",
         "flightphp/runway": "^1.2",
-        "flightphp/active-record": "^0.7",
         "flightphp/session": "^0.3",
-        "level-2/dice": "^4.0",
-        "tracy/tracy": "^2.9",
-        "smarty/smarty": "^5.0",
-        "twbs/bootstrap": "^5.3.8",
-        "twbs/bootstrap-icons": "^1.13",
         "monolog/monolog": "^3.9",
         "overclokk/cookie": "^1.0",
-        "flightphp/cache": "^1.1"
-
+        "smarty/smarty": "^5.0",
+        "tracy/tracy": "^2.9",
+        "twbs/bootstrap": "^5.3.8",
+        "twbs/bootstrap-icons": "^1.13"
     },
     "require-dev":
     {
