@@ -45,7 +45,7 @@ class MySubModelController
         $mySub = new MySubModel( $this->db, $this->tableName );
 
         $rows = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
-        dd( $rows );
+        // dd( $rows );
 
         bdump( 'Список из таблицы: ' . htmlspecialchars( $this->tableName ), 'INDEX' );
 
