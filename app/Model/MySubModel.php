@@ -29,10 +29,7 @@ class MySubModel extends ActiveRecord
         string $table_name
 
     ) {
-        $this->table_name
-        = $table_name
-        ;
-        parent::__construct( $databaseConnection, $this->table_name
-        );
+        $this->table_name = $table_name;
+        parent::__construct( $databaseConnection, $this->table_name );
     }
 }

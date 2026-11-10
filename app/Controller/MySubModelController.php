@@ -44,9 +44,7 @@ class MySubModelController
         );
         $rows = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
 
-        $this->app->renderSmarty( 'companies/index', [
-            'companies' => $rows,
-        ] );
+        $this->app->renderSmarty( $this->table_name . '/index', ['rows' => $rows] );
     }
 
     /**
@@ -54,8 +52,7 @@ class MySubModelController
      */
     public function show( $id ): void
     {
-        $mySub = new MySubModel( $this->db, $this->table_name
-        );
+        $mySub = new MySubModel( $this->db, $this->table_name );
         $mySub->find( (int) $id );
 
         if ( !$mySub->isHydrated() ) {
@@ -64,16 +61,13 @@ class MySubModelController
             return;
         }
 
-        $this->app->renderSmarty( 'companies/show', [
-            'company' => $mySub,
-        ] );
+        $this->app->renderSmarty( $this->table_name . '/show', ['mySub' => $mySub] );
     }
 
     public function apiIndex(): void
     {
-        $mySub = new MySubModel( $this->db, $this->table_name
-        );
-        $rows = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
+        $mySub = new MySubModel( $this->db, $this->table_name );
+        $rows  = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
 
         $data = [];
         foreach ( $rows as $row ) {
