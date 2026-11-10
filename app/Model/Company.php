@@ -4,6 +4,7 @@ declare ( strict_types = 1 );
 
 namespace App\Model;
 
+use App\Model\MySubModel;
 use flight\ActiveRecord;
 
 /**
@@ -17,13 +18,16 @@ use flight\ActiveRecord;
  *
  * @link https://docs.flightphp.com/awesome-plugins/active-record
  */
-class Company extends ActiveRecord
+class Company extends MySubModel
 {
     /**
      * @param mixed $databaseConnection PDO / SimplePdo / mysqli connection
      */
+    public string $table_name
+    = 'companies';
     public function __construct( $databaseConnection )
     {
-        parent::__construct( $databaseConnection, 'companies' );
+        parent::__construct( $databaseConnection, $this->table_name
+        );
     }
 }

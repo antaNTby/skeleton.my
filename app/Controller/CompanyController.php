@@ -4,6 +4,7 @@ declare ( strict_types = 1 );
 
 namespace App\Controller;
 
+use App\Controller\MySubModelController;
 use App\Model\Company;
 use flight\database\SimplePdo;
 use flight\Engine;
@@ -12,7 +13,7 @@ use flight\Engine;
  * Example CRUD-ish controller using ActiveRecord + SimplePdo.
  * Run `php runway migrate` first so the companies table exists.
  */
-class CompanyController
+class CompanyController extends MySubModelController
 {
     /** @var Engine<object> */
     private $app;

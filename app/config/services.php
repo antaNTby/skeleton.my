@@ -192,7 +192,7 @@ $container = $container->addRule( '*', [
 
 // Shared rules for classes resolved by name (belt + suspenders)
 $container = $container->addRule( Config::class, ['shared' => true] );
-$container = $container->addRule( Environment::class, ['shared' => true] );
+// $container = $container->addRule( Environment::class, ['shared' => true] );
 $container = $container->addRule( Smarty::class, ['shared' => true] );
 $container = $container->addRule( Session::class, ['shared' => true] );
 if ( $db instanceof SimplePdo ) {
