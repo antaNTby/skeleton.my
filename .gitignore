@@ -3,7 +3,7 @@
 /.vscode/
 /.vagrant/
 /.runway-creds.json
-/app/config/config.php
+# /app/config/config.php
 /.env
 /database.sqlite
 /app/cache/*
