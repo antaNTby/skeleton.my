@@ -20,7 +20,7 @@ return [
         // Trailing slash is normalized at runtime (Config::baseUrl()).
         // Use '/' for app root, or a subpath like '/myapp' / '/myapp/'.
         'base_url' => '/',
-        'timezone' => 'UTC+9',
+        'timezone' => 'UTC+3',
     ],
     'database'  => [
         // sqlite (default — works after create-project with no MySQL)

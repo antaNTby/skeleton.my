@@ -18,6 +18,8 @@
 $ds          = DIRECTORY_SEPARATOR;
 $projectRoot = dirname( __DIR__, 2 );
 
+define( 'PROJECT_ROOT', $projectRoot );
+
 require $projectRoot . $ds . 'vendor' . $ds . 'autoload.php';
 
 use App\Utils\Config;

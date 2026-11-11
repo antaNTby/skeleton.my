@@ -25,11 +25,11 @@ $router->group( '', function ( Router $router ) use ( $config ) {
         $router->get( '/MySub/@table_name', [MySubModelController::class, 'index'] );
         $router->get( '/MySub/@table_name/@id:[0-9]+', [MySubModelController::class, 'show'] );
 
-        $router->get( '/posts', [PostController::class, 'index'] );
-        $router->get( '/posts/@id:[0-9]+', [PostController::class, 'show'] );
+        // $router->get( '/posts', [PostController::class, 'index'] );
+        // $router->get( '/posts/@id:[0-9]+', [PostController::class, 'show'] );
 
-        $router->get( '/companies', [CompanyController::class, 'index'] );
-        $router->get( '/companies/@id:[0-9]+', [CompanyController::class, 'show'] );
+        // $router->get( '/companies', [CompanyController::class, 'index'] );
+        // $router->get( '/companies/@id:[0-9]+', [CompanyController::class, 'show'] );
 
         $router->group( '/api', function ( Router $router ) {
             $router->get( '/posts', [PostController::class, 'apiIndex'] );

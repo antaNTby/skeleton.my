@@ -42,37 +42,59 @@ class MySubModelController
 
     public function index(): void
     {
-        $mySub = new MySubModel( $this->db, $this->tableName );
+        $subModel = new MySubModel( $this->db, $this->tableName );
 
-        $rows = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
+        $rows = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
         // dd( $rows );
 
         bdump( 'Список из таблицы: ' . htmlspecialchars( $this->tableName ), 'INDEX' );
 
-        $this->app->renderSmarty( $this->tableName . '/index', ['rows' => $rows] );
+        $this->_render( 'index', ['rows' => $rows] );
     }
 
     /**
      * @param string|int $id
      */
-    public function show( $id ): void
-    {
-        $mySub = new MySubModel( $this->db, $this->tableName );
-        $mySub->find( (int) $id );
+    public function show(
+        string $table_name,
+               $id
+    ): void {
+        $subModel = new MySubModel( $this->db, $this->tableName );
 
-        if ( !$mySub->isHydrated() ) {
+        $row = $subModel->find( (int) $id );
+
+        if ( !$row->isHydrated() ) {
             $this->app->halt( 404, 'MySubModel not found' );
 
             return;
         }
 
-        $this->app->renderSmarty( $this->tableName . '/show', ['mySub' => $mySub] );
+        $this->_render( 'show', ['row' => $row] );
+    }
+
+    private function _render(
+        string $method = 'index',
+        array  $data = []
+    ): void {
+        $templateDir = PROJECT_ROOT . '/templates';
+        $template    = $this->tableName . '/' . $method;
+        // Формируем полный физический путь к файлу шаблона.
+        $templatePath = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $templateDir . DIRECTORY_SEPARATOR . $template . '.tpl.html' );
+
+        // Проверяем, существует ли файл шаблона на диске
+        if ( !is_file( $templatePath ) ) {
+            // Если индивидуального шаблона для таблицы нет, переключаемся на default
+            $template = 'default/' . $method;
+        }
+        bdump( $template, 'template' );
+        $this->app->renderSmarty( $template, ['template_data' => $data] );
+
     }
 
     public function apiIndex(): void
     {
-        $mySub = new MySubModel( $this->db, $this->tableName );
-        $rows  = $mySub->orderByColumn( 'id', 'ASC' )->findAll();
+        $subModel = new MySubModel( $this->db, $this->tableName );
+        $rows     = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
 
         $data = [];
         foreach ( $rows as $row ) {
@@ -96,21 +118,21 @@ class MySubModelController
      */
     public function apiShow( $id ): void
     {
-        $mySub = new MySubModel( $this->db, $this->tableName
+        $subModel = new MySubModel( $this->db, $this->tableName
         );
-        $mySub->find( (int) $id );
+        $subModel->find( (int) $id );
 
-        if ( !$mySub->isHydrated() ) {
+        if ( !$subModel->isHydrated() ) {
             $this->app->json( ['error' => 'MySubModel not found'], 404 );
 
             return;
         }
 
         $this->app->json( [
-            'id'            => $mySub->id,
-            'name'          => $mySub->name,
-            'legal_address' => $mySub->legal_address,
-            'created_at'    => $mySub->created_at,
+            'id'            => $subModel->id,
+            'name'          => $subModel->name,
+            'legal_address' => $subModel->legal_address,
+            'created_at'    => $subModel->created_at,
         ], 200, true, 'utf-8', JSON_PRETTY_PRINT );
     }
 }

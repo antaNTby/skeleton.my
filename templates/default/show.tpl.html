@@ -1,0 +1,47 @@
+{extends file='layout.tpl.html'}
+{block name='title'}Просмотр записи — FlightPHP Skeleton{/block}
+{block name='body'}
+<div class="container py-4">
+    <div class="mb-3">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+            &larr; Назад к списку
+        </a>
+    </div>
+
+    {if isset($template_data.row)}
+        {$recordData = $template_data.row->getData()}
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h5 mb-0">
+                    Детали записи {if isset($recordData.id)}#{$recordData.id|escape}{/if}
+                </h2>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-bordered mb-0">
+                    <tbody>
+                        {foreach from=$recordData key=column item=value}
+                            <tr>
+                                <th class="bg-light w-25">{$column|escape}</th>
+                                <td>
+                                    {if $value === true || $value === false}
+                                        {if $value}Да{else}Нет{/if}
+                                    {elseif $value === null}
+                                        <span class="text-muted">NULL</span>
+                                    {else}
+                                        {$value|escape|nl2br}
+                                    {/if}
+                                </td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {else}
+        <div class="alert alert-danger">
+            Данные записи не переданы в шаблон.
+        </div>
+    {/if}
+</div>
+{/block}
