@@ -43,8 +43,7 @@ class MySubModelController
     public function index(): void
     {
         $subModel = new MySubModel( $this->db, $this->tableName );
-
-        $rows = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
+        $rows     = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
         // dd( $rows );
 
         bdump( 'Список из таблицы: ' . htmlspecialchars( $this->tableName ), 'INDEX' );
@@ -116,8 +115,10 @@ class MySubModelController
     /**
      * @param string|int $id
      */
-    public function apiShow( $id ): void
-    {
+    public function apiShow(
+        string $table_name,
+               $id
+    ): void {
         $subModel = new MySubModel( $this->db, $this->tableName
         );
         $subModel->find( (int) $id );

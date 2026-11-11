@@ -32,11 +32,11 @@ $router->group( '', function ( Router $router ) use ( $config ) {
         // $router->get( '/companies/@id:[0-9]+', [CompanyController::class, 'show'] );
 
         $router->group( '/api', function ( Router $router ) {
-            $router->get( '/posts', [PostController::class, 'apiIndex'] );
-            $router->get( '/companies', [CompanyController::class, 'apiIndex'] );
+            $router->get( '/@table_name', [PostController::class, 'apiIndex'] );
+            $router->get( '/@table_name', [CompanyController::class, 'apiIndex'] );
 
-            $router->get( '/posts/@id:[0-9]+', [PostController::class, 'apiShow'] );
-            $router->get( '/companies/@id:[0-9]+', [CompanyController::class, 'apiShow'] );
+            $router->get( '/@table_name/@id:[0-9]+', [PostController::class, 'apiShow'] );
+            $router->get( '/@table_name/@id:[0-9]+', [CompanyController::class, 'apiShow'] );
         } );
     }
 }, [SecurityHeadersMiddleware::class] );
