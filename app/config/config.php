@@ -1,7 +1,6 @@
-
 <?php
 
-    /**
+/**
  * Project defaults — literal array only (Runway-safe).
  *
  * Copy to config.php (composer create-project does this for you).
@@ -14,7 +13,7 @@
  * bootstrap.php so Runway only rewrites the data block.
  */
 
-    return [
+return [
     'app'       => [
         'env'      => 'development',
         'debug'    => true,
@@ -49,7 +48,7 @@
         'prefix'    => 'flight_sess_',
         // null = system temp /flight_sessions (see flightphp/session docs)
         // 'save_path' => null,
-        'save_path' => __DIR__ . '/storage/sessions',
+        'save_path' => __DIR__ . '/../../sessions',
     ],
     'runway'    => [
         'index_root' => 'public/index.php',

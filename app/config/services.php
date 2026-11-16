@@ -32,6 +32,23 @@ if ( !isset( $app ) || !( $app instanceof Engine ) || !( $config instanceof Conf
 }
 
 // ---------------------------------------------------------------------------
+// Session (flightphp/session)
+// ---------------------------------------------------------------------------
+$sessionOptions = [
+    'prefix'      => (string) $config->get( 'session.prefix', 'flight_sess_' ),
+    'auto_commit' => true,
+];
+$savePath = $config->get( 'session.save_path' );
+if ( $savePath !== null && $savePath !== '' ) {
+    $sessionOptions['save_path'] = (string) $savePath;
+}
+// Defer session start on CLI
+if ( PHP_SAPI === 'cli' ) {
+    $sessionOptions['start_session'] = false;
+}
+$session = new Session( $sessionOptions );
+
+// ---------------------------------------------------------------------------
 // Tracy
 // ---------------------------------------------------------------------------
 $logDir = $projectRoot . $ds . 'app' . $ds . 'log';
@@ -47,21 +64,6 @@ if ( $config->isDebug() ) {
 Debugger::$logDirectory = $logDir;
 Debugger::$strictMode   = true;
 
-if ( Debugger::$showBar === true && PHP_SAPI !== 'cli' && class_exists( TracyExtensionLoader::class ) ) {
-    new TracyExtensionLoader( $app );
-}
-
-// ---------------------------------------------------------------------------
-// Database (SimplePdo) — optional if driver is empty
-// ---------------------------------------------------------------------------
-$db = null;
-if ( DatabaseFactory::isEnabled( $config ) ) {
-    $db = DatabaseFactory::create( $config );
-    // Optional Flight::db() for ecosystem code; app layer should inject SimplePdo
-    $app->map( 'db', function () use ( $db ) {
-        return $db;
-    } );
-}
 // Хук для автоматического логирования критических ошибок и переноса HTML-дампов
 Debugger::$onFatalError[] = static function ( \Throwable $exception ) use ( $logDir ) {
     Debugger::log( $exception, Debugger::EXCEPTION );
@@ -80,6 +82,34 @@ Debugger::$onFatalError[] = static function ( \Throwable $exception ) use ( $log
         }
     }
 };
+
+//  Подключаем расширения Tracy Bar для браузера
+if ( Debugger::$showBar && php_sapi_name() !== 'cli' ) {
+
+    Flight::set( 'flight.content_length', false );
+
+    static $isLoaderInitialized = false;
+    if ( $isLoaderInitialized === false ) {
+        // Передаем данные в Tracy
+        $loader = new TracyExtensionLoader( Flight::app(), [
+            'session_data' => $session->getAll(),
+        ] );
+
+        $isLoaderInitialized = true;
+    }
+
+}
+// ---------------------------------------------------------------------------
+// Database (SimplePdo) — optional if driver is empty
+// ---------------------------------------------------------------------------
+$db = null;
+if ( DatabaseFactory::isEnabled( $config ) ) {
+    $db = DatabaseFactory::create( $config );
+    // Optional Flight::db() for ecosystem code; app layer should inject SimplePdo
+    $app->map( 'db', function () use ( $db ) {
+        return $db;
+    } );
+}
 
 // ---------------------------------------------------------------------------
 // Smarty
@@ -137,23 +167,6 @@ $app->map( 'renderSmarty', function (
 } );
 
 // ---------------------------------------------------------------------------
-// Session (flightphp/session)
-// ---------------------------------------------------------------------------
-$sessionOptions = [
-    'prefix'      => (string) $config->get( 'session.prefix', 'flight_sess_' ),
-    'auto_commit' => true,
-];
-$savePath = $config->get( 'session.save_path' );
-if ( $savePath !== null && $savePath !== '' ) {
-    $sessionOptions['save_path'] = (string) $savePath;
-}
-// Defer session start on CLI
-if ( PHP_SAPI === 'cli' ) {
-    $sessionOptions['start_session'] = false;
-}
-$session = new Session( $sessionOptions );
-
-// ---------------------------------------------------------------------------
 // flight\Container + Engine dependencies
 // ---------------------------------------------------------------------------
 // Создаем экземпляр встроенного контейнера Flight
@@ -189,5 +202,7 @@ $app->map( 'make', function (
 ) use ( $container ) {
     return $container->get( $class, $params );
 } );
+
+$session->set( 'test_sess', $nonce );
 
 bdump( $container );
