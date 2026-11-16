@@ -1,6 +1,7 @@
+
 <?php
 
-/**
+    /**
  * Project defaults — literal array only (Runway-safe).
  *
  * Copy to config.php (composer create-project does this for you).
@@ -13,7 +14,7 @@
  * bootstrap.php so Runway only rewrites the data block.
  */
 
-return [
+    return [
     'app'       => [
         'env'      => 'development',
         'debug'    => true,
@@ -25,13 +26,13 @@ return [
     'database'  => [
         // sqlite (default — works after create-project with no MySQL)
         // or mysql. Empty string disables DB registration and post/demo routes.
-        'driver'    => 'mysql',
-        'host'      => 'MySql-8.4',
-        'dbname'    => 'newDB',
-        'user'      => 'antaNT64',
-        'password'  => 'root',
-        'file_path' => __DIR__ . '/../../database.sqlite',
-        'charset'   => 'utf8mb4',
+        'driver'   => 'mysql',
+        'host'     => 'MySql-8.4',
+        'dbname'   => 'newDB',
+        'user'     => 'antaNT64',
+        'password' => 'root',
+        // 'file_path' => __DIR__ . '/../../database.sqlite',
+        'charset'  => 'utf8mb4',
     ],
     'database2' => [
         // sqlite (default — works after create-project with no MySQL)
@@ -47,7 +48,8 @@ return [
     'session'   => [
         'prefix'    => 'flight_sess_',
         // null = system temp /flight_sessions (see flightphp/session docs)
-        'save_path' => null,
+        // 'save_path' => null,
+        'save_path' => __DIR__ . '/storege/sessions',
     ],
     'runway'    => [
         'index_root' => 'public/index.php',

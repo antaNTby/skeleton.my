@@ -16,7 +16,6 @@
 
 use App\Utils\Config;
 use App\Utils\DatabaseFactory;
-use Dice\Dice;
 use flight\Container;
 use flight\database\SimplePdo;
 use flight\debug\tracy\TracyExtensionLoader;
@@ -26,8 +25,6 @@ use flight\net\Route;
 use flight\Session;
 use Smarty\Smarty;
 use Tracy\Debugger;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 // Runway loads config.php then services.php for config:get/set. No Engine yet.
 if ( !isset( $app ) || !( $app instanceof Engine ) || !( $config instanceof Config ) ) {
@@ -65,39 +62,6 @@ if ( DatabaseFactory::isEnabled( $config ) ) {
         return $db;
     } );
 }
-
-// ---------------------------------------------------------------------------
-// Twig
-// ---------------------------------------------------------------------------
-#####  $viewsPath = $projectRoot . $ds . 'app' . $ds . 'views';
-#####  $twigCache = $projectRoot . $ds . 'app' . $ds . 'cache' . $ds . 'twig';
-#####  if ( !is_dir( $twigCache ) ) {
-#####      mkdir( $twigCache, 0775, true );
-#####  }
-#####
-#####  $loader = new FilesystemLoader( $viewsPath );
-#####  $twig   = new Environment( $loader, [
-#####      'cache'       => $config->isDebug() ? false : $twigCache,
-#####      'debug'       => $config->isDebug(),
-#####      'auto_reload' => $config->isDebug(),
-#####  ] );
-#####
-#####  $twig->addGlobal( 'csp_nonce', $nonce );
-#####  $twig->addGlobal( 'app_env', $config->env() );
-#####  // Always trailing slash so {{ base_url }}posts joins correctly under subpaths
-#####  $twig->addGlobal( 'base_url', $config->baseUrl() );
-#####
-#####  // Map Flight render → Twig (single documented view path)
-#####  $app->map( 'render', function (
-#####      string $template,
-#####      array  $data = []
-#####  ) use ( $app, $twig ) {
-#####      // Allow "welcome" or "welcome.twig"
-#####      if ( substr( $template, -5 ) !== '.twig' ) {
-#####          $template .= '.twig';
-#####      }
-#####      $app->response()->write( $twig->render( $template, $data ) );
-#####  } );
 
 // ---------------------------------------------------------------------------
 // Smarty
@@ -170,54 +134,6 @@ if ( PHP_SAPI === 'cli' ) {
     $sessionOptions['start_session'] = false;
 }
 $session = new Session( $sessionOptions );
-
-// ---------------------------------------------------------------------------
-// Dice + Engine substitutions (required — see Flight DI docs)
-// ---------------------------------------------------------------------------
-#####  $container = new Dice();
-#####
-#####  // Critical: reuse the same Engine instance; do not construct a new one
-#####  $substitutions = [
-#####      Engine::class  => $app,
-#####      Config::class  => $config,
-#####      // Environment::class => $twig,
-#####      Smarty::class  => $smarty,
-#####      Session::class => $session,
-#####  ];
-#####
-#####  if ( $db instanceof SimplePdo ) {
-#####      $substitutions[SimplePdo::class] = $db;
-#####  }
-#####
-#####  $container = $container->addRule( '*', [
-#####      'substitutions' => $substitutions,
-#####  ] );
-#####
-#####  // Shared rules for classes resolved by name (belt + suspenders)
-#####  $container = $container->addRule( Config::class, ['shared' => true] );
-#####  // $container = $container->addRule( Environment::class, ['shared' => true] );
-#####  $container = $container->addRule( Smarty::class, ['shared' => true] );
-#####  $container = $container->addRule( Session::class, ['shared' => true] );
-#####  if ( $db instanceof SimplePdo ) {
-#####      $container = $container->addRule( SimplePdo::class, ['shared' => true] );
-#####  }
-#####
-#####  $app->registerContainerHandler( function (
-#####      $class,
-#####      $params
-#####  ) use ( $container ) {
-#####      return $container->create( $class, $params );
-#####  } );
-#####
-#####  // dd( $container );
-#####
-#####  // Helper for non-route code: $app->make(SomeClass::class)
-#####  $app->map( 'make', function (
-#####      $class,
-#####      $params = []
-#####  ) use ( $container ) {
-#####      return $container->create( $class, $params );
-#####  } );
 
 // ---------------------------------------------------------------------------
 // flight\Container + Engine dependencies
