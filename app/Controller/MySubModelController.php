@@ -75,7 +75,7 @@ class MySubModelController
         string $method = 'index',
         array  $data = []
     ): void {
-        $templateDir = PROJECT_ROOT . '/templates';
+        $templateDir = TEMPLATE_DIR;
         $template    = $this->tableName . '/' . $method;
         // Формируем полный физический путь к файлу шаблона.
         $templatePath = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $templateDir . DIRECTORY_SEPARATOR . $template . '.tpl.html' );
@@ -109,7 +109,7 @@ class MySubModelController
             ];
         }
 
-        $this->app->json( $data, 200, true, 'utf-8', JSON_PRETTY_PRINT );
+        $this->app->json( $data, 200, true, 'utf-8', JSON_PRETTY_PRINT | DEFAULT_JSON_FLAGS );
     }
 
     /**
@@ -134,6 +134,6 @@ class MySubModelController
             'name'          => $subModel->name,
             'legal_address' => $subModel->legal_address,
             'created_at'    => $subModel->created_at,
-        ], 200, true, 'utf-8', JSON_PRETTY_PRINT );
+        ], 200, true, 'utf-8', JSON_PRETTY_PRINT | DEFAULT_JSON_FLAGS );
     }
 }

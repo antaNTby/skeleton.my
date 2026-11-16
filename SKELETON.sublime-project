@@ -39,11 +39,11 @@
             "public/lib/bootstrap-icons/icons",
             // "smarty",
             "trash",
-            "compile_dir",
-            "smarty_cache",
-            "tests",
-            "migrations",
-            "app/views"
+            // "compile_dir",
+            // "smarty_cache",
+            // "tests",
+            // "migrations",
+            // "app/views"
         ]
 
     }],

@@ -51,29 +51,25 @@ $session = new Session( $sessionOptions );
 // ---------------------------------------------------------------------------
 // Tracy
 // ---------------------------------------------------------------------------
-$logDir = $projectRoot . $ds . 'app' . $ds . 'log';
-if ( !is_dir( $logDir ) ) {
-    mkdir( $logDir, 0775, true );
-}
 
 if ( $config->isDebug() ) {
     Debugger::enable( Debugger::Development );
 } else {
     Debugger::enable( Debugger::Production );
 }
-Debugger::$logDirectory = $logDir;
+Debugger::$logDirectory = LOGS_DIR;
 Debugger::$strictMode   = true;
 
 // Хук для автоматического логирования критических ошибок и переноса HTML-дампов
-Debugger::$onFatalError[] = static function ( \Throwable $exception ) use ( $logDir ) {
+Debugger::$onFatalError[] = static function ( \Throwable $exception ) use ( $logsDir ) {
     Debugger::log( $exception, Debugger::EXCEPTION );
 
-    $htmlDumpDir = $logDir . DIRECTORY_SEPARATOR . 'tracy_html';
+    $htmlDumpDir = $logsDir . DIRECTORY_SEPARATOR . 'tracy_html';
     if ( !is_dir( $htmlDumpDir ) ) {
         mkdir( $htmlDumpDir, 0775, true );
     }
 
-    $files = glob( $logDir . DIRECTORY_SEPARATOR . 'exception-*.*' );
+    $files = glob( $logsDir . DIRECTORY_SEPARATOR . 'exception-*.*' );
     if ( is_array( $files ) ) {
         foreach ( $files as $file ) {
             if ( is_file( $file ) ) {
@@ -109,46 +105,19 @@ if ( DatabaseFactory::isEnabled( $config ) ) {
     $app->map( 'db', function () use ( $db ) {
         return $db;
     } );
-    $db2 = DatabaseFactory::create2( $config );
-    // Optional Flight::db() for ecosystem code; app layer should inject SimplePdo
-    $app->map( 'db2', function () use ( $db2 ) {
-        return $db2;
-    } );
 }
 
-dd( $app->db2() );
 // ---------------------------------------------------------------------------
 // Smarty
 // ---------------------------------------------------------------------------
 
-$templateDir = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'templates' );
-$compileDir  = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'app/cache/smarty/compile_dir' );
-$cacheDir    = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'app/cache/smarty/cache_dir' );
-$configDir   = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . $ds . 'app/config/smarty_config_dir' );
-
-// Проверяем и создаём необходимые директории
-$directories = [$templateDir, $compileDir, $cacheDir, $configDir];
-foreach ( $directories as $directory ) {
-    if ( !is_dir( $directory ) ) {
-        if (
-            !mkdir( $directory, 0775, true )
-            && !is_dir( $directory )
-        ) {
-            throw new RuntimeException(
-                "Unable to create directory: {$directory}"
-            );
-        }
-    }
-
-}
-
 $smarty = new Smarty();
 
 // Настройка путей Smarty 5
-$smarty->setTemplateDir( $templateDir );
-$smarty->setCompileDir( $compileDir );
-$smarty->setCacheDir( $cacheDir );
-$smarty->setConfigDir( $configDir );
+$smarty->setTemplateDir( TEMPLATE_DIR );
+$smarty->setCompileDir( COMPILE_DIR );
+$smarty->setCacheDir( CACHE_DIR );
+$smarty->setConfigDir( CONFIG_DIR_SMARTY );
 
 $smarty->compile_id = 'skeleton_';
 

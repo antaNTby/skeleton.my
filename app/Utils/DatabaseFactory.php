@@ -75,59 +75,14 @@ final class DatabaseFactory
         return $connection;
     }
 
-    public static function create2( Config $config ): SimplePdo
-    {
-        $driver = strtolower( (string) $config->get( 'database2.driver', '' ) );
-
-        if ( $driver === '' ) {
-            throw new InvalidArgumentException(
-                'Database is not configured. Set database2.driver in config.php or DB_DRIVER in .env'
-            );
-        }
-
-        $dsn      = self::buildDsn( $config, $driver );
-        $user     = $config->get( 'database2.user' );
-        $password = $config->get( 'database2.password' );
-
-        $options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-            PDO::ATTR_STRINGIFY_FETCHES  => false,
-        ];
-        $options_debug = [
-            'trackApmQueries' => (string) $config->isDebug(),
-            'maxQueryMetrics' => 1000,
-        ];
-
-        $connection = new SimplePdo(
-            $dsn,
-            $user !== null && $user !== '' ? (string) $user : null,
-            $password !== null ? (string) $password : null,
-            $options
-        );
-
-        if ( $config->isDebug() ) {
-            $connection = new PdoQueryCapture(
-                $dsn,
-                $user !== null && $user !== '' ? (string) $user : null,
-                $password !== null ? (string) $password : null,
-                $options,
-                $options_debug
-            );
-        }
-
-        return $connection;
-    }
-
     private static function buildDsn(
         Config $config,
         string $driver
     ): string {
         if ( $driver === 'sqlite' ) {
-            $path = (string) $config->get( 'database2.file_path', '' );
+            $path = (string) $config->get( 'database.file_path', '' );
             if ( $path === '' ) {
-                throw new InvalidArgumentException( 'database2.file_path is required for sqlite' );
+                throw new InvalidArgumentException( 'database.file_path is required for sqlite' );
             }
 
             $dir = dirname( $path );
