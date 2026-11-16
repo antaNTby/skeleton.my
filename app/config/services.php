@@ -109,8 +109,14 @@ if ( DatabaseFactory::isEnabled( $config ) ) {
     $app->map( 'db', function () use ( $db ) {
         return $db;
     } );
+    $db2 = DatabaseFactory::create2( $config );
+    // Optional Flight::db() for ecosystem code; app layer should inject SimplePdo
+    $app->map( 'db2', function () use ( $db2 ) {
+        return $db2;
+    } );
 }
 
+dd( $app->db2() );
 // ---------------------------------------------------------------------------
 // Smarty
 // ---------------------------------------------------------------------------
