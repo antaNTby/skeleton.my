@@ -14,6 +14,8 @@
  *     → routes.php
  *     → $app->start()
  */
+use App\Utils\Config;
+use App\Utils\Env;
 
 $ds          = DIRECTORY_SEPARATOR;
 $projectRoot = dirname( __DIR__, 2 );
@@ -21,9 +23,6 @@ $projectRoot = dirname( __DIR__, 2 );
 define( 'PROJECT_ROOT', $projectRoot );
 
 require $projectRoot . $ds . 'vendor' . $ds . 'autoload.php';
-
-use App\Utils\Config;
-use App\Utils\Env;
 
 // Layer 1: .env / real environment (secrets + deploy overrides)
 Env::load( $projectRoot . $ds . '.env' );

@@ -1,6 +1,6 @@
 {
-    "name": "flightphp/skeleton",
-    "description": "A Flight PHP framework skeleton app optimized for AI-assisted and human development",
+    "name": "ant/skeleton",
+    "description": "FlightPHP Core, Smarty 5 и Bootstrap.A Flight PHP framework skeleton app optimized for AI-assisted and human development",
     "keywords": [
         "microframework",
         "rest",
@@ -22,7 +22,7 @@
     }],
     "require":
     {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.5",
         "ext-json": "*",
         "ext-pdo": "*",
         "flightphp/active-record": "^0.7",
@@ -31,16 +31,18 @@
         "flightphp/core": "^3.19",
         "flightphp/runway": "^1.2",
         "flightphp/session": "^0.3",
+        "flightphp/tracy-extensions": "^0.2.7",
         "monolog/monolog": "^3.9",
         "overclokk/cookie": "^1.0",
         "smarty/smarty": "^5.0",
-        "tracy/tracy": "^2.9",
+        "tracy/tracy": "^2.11",
         "twbs/bootstrap": "^5.3.8",
-        "twbs/bootstrap-icons": "^1.13"
+        "twbs/bootstrap-icons": "^1.13",
+        "vlucas/phpdotenv": "^5.6"
     },
     "require-dev":
     {
-        "flightphp/tracy-extensions": "^0.1 || ^0.2",
+        "flightphp/tracy-extensions": "^0.2",
         "phpstan/phpstan": "^1.12",
         "phpunit/phpunit": "^9.6",
         "symfony/var-dumper": "*"
@@ -73,6 +75,10 @@
         "test": "phpunit",
         "analyse": "phpstan analyse --memory-limit=512M",
         "phpstan": "@analyse",
+
+        "lint-validate": "composer validate --strict",
+        "autoload": "composer dump-autoload --optimize",
+
         "check": [
             "@test",
             "@analyse"

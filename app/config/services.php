@@ -170,7 +170,7 @@ $app->map( 'renderSmarty', function (
 // flight\Container + Engine dependencies
 // ---------------------------------------------------------------------------
 // Создаем экземпляр встроенного контейнера Flight
-$container = new \flight\Container();
+$container = new Container();
 
 // Регистрируем общие экземпляры (Singletons / Shared), которые мы уже создали
 $container->singleton( Engine::class, $app );
