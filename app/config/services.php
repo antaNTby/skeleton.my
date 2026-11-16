@@ -62,6 +62,24 @@ if ( DatabaseFactory::isEnabled( $config ) ) {
         return $db;
     } );
 }
+// Хук для автоматического логирования критических ошибок и переноса HTML-дампов
+Debugger::$onFatalError[] = static function ( \Throwable $exception ) use ( $logDir ) {
+    Debugger::log( $exception, Debugger::EXCEPTION );
+
+    $htmlDumpDir = $logDir . DIRECTORY_SEPARATOR . 'tracy_html';
+    if ( !is_dir( $htmlDumpDir ) ) {
+        mkdir( $htmlDumpDir, 0775, true );
+    }
+
+    $files = glob( $logDir . DIRECTORY_SEPARATOR . 'exception-*.*' );
+    if ( is_array( $files ) ) {
+        foreach ( $files as $file ) {
+            if ( is_file( $file ) ) {
+                rename( $file, $htmlDumpDir . DIRECTORY_SEPARATOR . basename( $file ) );
+            }
+        }
+    }
+};
 
 // ---------------------------------------------------------------------------
 // Smarty
