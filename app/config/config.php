@@ -49,7 +49,7 @@
         'prefix'    => 'flight_sess_',
         // null = system temp /flight_sessions (see flightphp/session docs)
         // 'save_path' => null,
-        'save_path' => __DIR__ . '/storege/sessions',
+        'save_path' => __DIR__ . '/storage/sessions',
     ],
     'runway'    => [
         'index_root' => 'public/index.php',
