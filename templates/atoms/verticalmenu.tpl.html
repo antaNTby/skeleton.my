@@ -1,0 +1,297 @@
+{if isset($dataDPT) && isset($dataDPT.base)}
+<hr class="my-1">
+<a href="{$smarty.const.PATH_ADMIN}{$smarty.const.PATH_DPT_SUBS}/{$dataDPT.base}/create" class="btn btn-primary d-inline-flex align-items-center">
+    {$dataDPT.icon|default:'<i class="bi bi-emoji-tear-fill"></i>'}&nbsp; Создать запись
+</a>
+<hr class="my-5">
+{/if}
+<h6 class="d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+    <span>dpt subs</span>
+    <a class="link-secondary" href="/admin/dashboard">
+        <svg class="bibi" aria-hidden="true">
+            <use xlink:href="#plus-circle" /></svg>
+    </a>
+</h6>
+<ul class="nav flex-column px-1">
+    {foreach $SubsCollection as $baseName => $pageData}
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="{$pageData.route}" title="{$pageData.titleOrk|default:$baseName}">
+            {$pageData.icon|default:'<i class="bi bi-emoji-tear-fill"></i>'} {$pageData.title|default:$baseName}
+        </a>
+    </li>
+    {/foreach}
+    <hr>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/admin/dpt/subs/currencies">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#currencies_sub" /></svg>
+            Типы валют
+        </a>
+    </li>
+    {* <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/admin/dpt/subs/users">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#users_sub" /></svg>
+            Пользователи
+        </a>
+    </li> *}
+    {* <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/admin/dpt/subs/sessions">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#sessions_sub" /></svg>
+            Сессии и токены
+        </a>
+    </li> *}
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/admin/dpt/subs/orders">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#orders_sub" /></svg>
+            Заказы
+        </a>
+    </li>
+    {*
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/admin/dpt/subs/companies">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#companies_sub" /></svg>
+            Организации/Реквизиты
+        </a>
+    </li>
+    *}
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/admin/dpt/subs/statuses">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#statuses_sub" /></svg>
+            Статусы заказов
+        </a>
+    </li>
+    <hr class="my-3">
+</ul>
+<h6 class="d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+    <span>flightphp</span>
+    <a class="link-secondary" href="https://docs.flightphp.com/" aria-label="https://docs.flightphp.com/">
+        <svg class="bibi" aria-hidden="true">
+            <use xlink:href="#plus-circle" /></svg>
+    </a>
+</h6>
+<ul class="nav flex-column px-1">
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://docs.flightphp.com/en/v3/learn/simple-pdo" aria-label="link">
+            <img src="/lib/ico/logo-flight.png" height="16px" alt="flightphph">
+            simple-pdo
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://docs.flightphp.com/en/v3/awesome-plugins/easy-query" aria-label="link">
+            <img src="/lib/ico/logo-flight.png" height="16px" alt="flightphph">
+            easy-query
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://docs.flightphp.com/en/v3/learn/routing" aria-label="link">
+            <img src="/lib/ico/logo-flight.png" height="16px" alt="flightphph">
+            routing
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://docs.flightphp.com/en/v3/learn/middleware" aria-label="link">
+            <img src="/lib/ico/logo-flight.png" height="16px" alt="flightphph">
+            middleware
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://docs.flightphp.com/en/v3/learn/collections" aria-label="link">
+            <img src="/lib/ico/logo-flight.png" height="16px" alt="flightphph">
+            collections
+        </a>
+    </li>
+    <hr class="my-3">
+</ul>
+<h6 class="d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+    <span>bootstrap</span>
+    <a class="link-secondary" href="https://getbootstrap.com/docs/5.3/getting-started/introduction/" aria-label="https://getbootstrap.com/docs/5.3/getting-started/introduction/">
+        <svg class="bibi" aria-hidden="true">
+            <use xlink:href="#plus-circle" /></svg>
+    </a>
+</h6>
+<ul class="nav flex-column px-1">
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://getbootstrap.com/docs/5.3/customize/color/" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            color
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://getbootstrap.com/docs/5.3/layout/breakpoints/" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            breakpoints
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://getbootstrap.com/docs/5.3/forms/form-control/" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            form-control
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://getbootstrap.com/docs/5.3/components/buttons" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            buttons
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://getbootstrap.com/docs/5.3/components/navbar/" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            navbar
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://getbootstrap.com/docs/5.3/components/dropdowns/" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            dropdowns
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" target="_blank" aria-current="page" href="https://icons.getbootstrap.com/#icons" aria-label="link">
+            <i class="bi bi-bootstrap-fill"></i>
+            icons
+        </a>
+    </li>
+    <hr class="my-3">
+</ul>
+<ul class="nav flex-column px-1">
+    <li class="nav-item">
+            <div class="security-actions d-inline-flex flex-column gap-2 p-2 bg-white shadow-sm  rounded-2">
+            <h5 class="text-danger">Безопасность</h5>
+            <p class="text-muted">Если вы потеряли устройство или подозреваете взлом, вы можете завершить все активные сеансы.</p>
+                <!-- Форма 2: Удалить истекшие токены -->
+                <form class="js-confirm-submit" data-message="Удалить все истекшие токены?" action="/deleteExpiredTokens" method="POST">
+                    {* {csrf_token} *}
+                    <button type="submit" class="w-100 btn btn-outline-danger" title="Удалить все истекшие токены">
+                        <i class="bi bi-trash"></i> Delete Expired Tokens
+                    </button>
+                </form>
+                <!-- Форма 1: Выйти на всех устройствах -->
+                <form class="js-confirm-submit" data-message="Вы уверены, что хотите выйти со всех устройств?" action="/logout-all" method="POST">
+                    {* {csrf_token} *}
+                    <button type="submit" class="w-100 btn btn-danger" title="Выйти на всех устройствах : удаляет все токены этого пользователя">
+                        <i class="bi bi-shield-slash"></i> logout-all
+                    </button>
+                </form>
+            </div>
+    </li>
+</ul>
+{* <h6 class="d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+    <span>Несуществующая херня</span>
+    <a class="link-secondary" href="#" aria-label="Add a new report">
+        <svg class="bibi" aria-hidden="true">
+            <use xlink:href="#plus-circle" /></svg>
+    </a>
+</h6> *}
+{* <ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#house-fill" /></svg>
+            Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#file-earmark" /></svg>
+            Orders
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#cart" /></svg>
+            Products
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#people" /></svg>
+            Customers
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#graph-up" /></svg>
+            Reports
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#puzzle" /></svg>
+            Integrations
+        </a>
+    </li>
+</ul> *}
+{* <h6 class="d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+    <span>Saved reports</span>
+    <a class="link-secondary" href="#" aria-label="Add a new report">
+        <svg class="bibi" aria-hidden="true">
+            <use xlink:href="#plus-circle" /></svg>
+    </a>
+</h6> *}
+{*
+<ul class="nav flex-column mb-auto">
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="/admin/log">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#file-earmark-text" /></svg>
+            monolog.log
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#file-earmark-text" /></svg>
+            Current month
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#file-earmark-text" /></svg>
+            Last quarter
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#file-earmark-text" /></svg>
+            Social engagement
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#file-earmark-text" /></svg>
+            Year-end sale
+        </a>
+    </li>
+</ul> *}
+{*
+<hr class="my-3">
+<ul class="nav flex-column mb-auto">
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="/admin/settings">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#gear-wide-connected" /></svg>
+            Settings
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="link-body-emphasis link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" href="#">
+            <svg class="bibi" aria-hidden="true">
+                <use xlink:href="#door-closed" /></svg>
+            Sign out
+        </a>
+    </li>
+</ul> *}

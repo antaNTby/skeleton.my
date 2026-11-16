@@ -56,10 +56,6 @@ define( 'LOGS_DIR', $logsDir );
 
 require PROJECT_ROOT . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-dump( __DIR__ );
-dump( PROJECT_ROOT );
-dump( APP_DIR );
-
 // Layer 1: .env / real environment (secrets + deploy overrides)
 Env::load( PROJECT_ROOT . DIRECTORY_SEPARATOR . '.env' );
 

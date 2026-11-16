@@ -75,18 +75,18 @@ class MySubModelController
         string $method = 'index',
         array  $data = []
     ): void {
-        $templateDir = TEMPLATE_DIR;
-        $template    = $this->tableName . '/' . $method;
+        $templateDir  = TEMPLATE_DIR;
+        $templateName = $this->tableName . '/' . $method;
         // Формируем полный физический путь к файлу шаблона.
-        $templatePath = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $templateDir . DIRECTORY_SEPARATOR . $template . '.tpl.html' );
+        $templatePath = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $templateDir . DIRECTORY_SEPARATOR . 'MySubs/' . $templateName . '.tpl.html' );
 
         // Проверяем, существует ли файл шаблона на диске
         if ( !is_file( $templatePath ) ) {
             // Если индивидуального шаблона для таблицы нет, переключаемся на default
-            $template = 'default/' . $method;
+            $templateName = 'MySubs/' . 'default/' . $method;
         }
-        bdump( $template, 'template' );
-        $this->app->renderSmarty( $template, ['template_data' => $data] );
+        bdump( $templateName, 'template' );
+        $this->app->renderSmarty( $templateName, ['template_data' => $data] );
 
     }
 

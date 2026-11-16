@@ -1,0 +1,74 @@
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    {foreach $SubsCollection as $baseName => $pageData}
+    {if $pageData@iteration > 3}
+    {break}
+    {/if}
+    <li class="nav-item">
+        <a class="nav-link text-nowrap" aria-current="page" href="{$pageData.route}">
+            {$pageData.icon|default:'<i class="bi bi-emoji-tear-fill"></i>'} {$pageData.title|default:$baseName}
+        </a>
+    </li>
+    {/foreach}
+
+
+
+{*     <li class="nav-item">
+        <a class="nav-link text-nowrap" aria-current="page" href="{$smarty.const.PATH_ADMIN}{$smarty.const.PATH_DPT_SUBS}/sessions">
+            sessions Sub
+            <a href="{admin_url status='active' search='iphone'}">Показать активные айфоны</a>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-nowrap" href="{admin_url sort=" username" dir=(($sort_direction=='asc' ) ? 'desc' : 'asc' )}">
+            test1
+            {if $sort_field == 'username'}
+            <i class="bi bi-sort-alpha-{$sort_direction}"></i>
+            {/if}
+        </a>
+    </li> *}
+
+
+{*     <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Logs
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" aria-current="page" href="/admin/settings">
+                    Настройки сайта
+                </a>
+            </li>
+            <li><a class="dropdown-item" aria-current="page" href="/admin/log3"> log-3</a></li>
+            <li><a class="dropdown-item" aria-current="page" href="/admin/log2"> log-2</a></li>
+            <li><a class="dropdown-item" aria-current="page" href="/admin/log"> log-1</a></li>
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+        </ul>
+    </li> *}
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Все страницы">
+            ...
+        </a>
+        <ul class="dropdown-menu">
+            {foreach $SubsCollection as $baseName => $pageData}
+            <li><a class="dropdown-item" aria-current="page" href="{$pageData.route}">{$pageData.titleOrk|default:$baseName}</a></li>
+            {/foreach}
+        </ul>
+    </li>
+
+
+    {* <div class="vr ms-2 me-1 bg-white d-none d-lg-block"></div> *}
+    <hr class="d-xl-none text-white-50">
+    <li class="nav-item">
+        <a class="nav-link text-nowrap" href="/about">
+            <i class="bi bi-info-circle"></i> О нас
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-nowrap" href="/contact">
+            <i class="bi bi-envelope"></i> Контакты
+        </a>
+    </li>
+</ul>

@@ -37,8 +37,7 @@
         "smarty/smarty": "^5.0",
         "tracy/tracy": "^2.11",
         "twbs/bootstrap": "^5.3.8",
-        "twbs/bootstrap-icons": "^1.13",
-        "vlucas/phpdotenv": "^5.6"
+        "twbs/bootstrap-icons": "^1.13"
     },
     "require-dev":
     {

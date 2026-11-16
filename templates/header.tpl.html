@@ -1,0 +1,46 @@
+<nav class="navbar navbar-expand-xl border-black user-select-none" style="background-color:#2a2a20;">
+    {* *}
+    <div class="container-fluid" style="max-width: 1900px;">
+        {* navbar-brand *}
+        {include file="atoms/navbar-brand.tpl.html"}
+        {* navbar-brand *}
+        {* searchpanel *}
+        {include file="atoms/searchpanel.tpl.html"}
+        {* searchpanel *}
+        <button class="navbar-toggler btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapsedArea" aria-controls="navbarCollapsedArea" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapsedArea">
+            {* headert_menu *}
+            {include file="header_menu.tpl.html"}
+            {* headert_menu *}
+            {* *}
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <hr class="d-xl-none text-white-50">
+                <li class="nav-item">
+                    <a class="nav-link text-nowrap active" href="/dashboard"
+>
+                        <i class="bi bi-gear"></i> Admin Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-nowrap" href="/">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-nowrap" href="/login">
+                        <i class="bi bi-box-arrow-in-left"></i> Login
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-nowrap" href="/logout">
+                        <i class="bi bi-box-arrow-in-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+            {* *}
+        </div> {* collapse *}
+    </div>
+    {* *}
+</nav>
