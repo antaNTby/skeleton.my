@@ -40,3 +40,25 @@ $router->group( '', function ( Router $router ) use ( $config ) {
         } );
     }
 }, [SecurityHeadersMiddleware::class] );
+
+Flight::route( 'GET /debug/relations', function () use ( $container ) {
+    $relManager    = $container->get( \App\Utils\Schema\RelationManager::class );
+    $schemaManager = $container->get( \App\Utils\Schema\SchemaManager::class );
+
+    $report = [];
+    foreach ( $schemaManager->all() as $table => $schema ) {
+        $relations      = $relManager->forTable( $table );
+        $report[$table] = [
+            'flag_in_schema' => $schema->hasRelations,
+            'actual_count'   => count( $relations ),
+            'strict_keys'    => array_keys( $relManager->strictForTable( $table ) ),
+            'implicit_keys'  => array_keys( $relManager->implicitForTable( $table ) ),
+            'display_fields' => array_map(
+                fn( $r ) => $r['display_field'] ?? '(hasMany)',
+                $relations
+            ),
+        ];
+    }
+
+    Flight::json( $report );
+} );

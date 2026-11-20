@@ -77,5 +77,5 @@ return array (
     'payload' => 'json',
     'created_at' => 'datetime',
   ),
-  'relations' => false,
+  'relations' => true,
 );

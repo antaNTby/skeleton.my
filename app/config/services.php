@@ -210,6 +210,20 @@ $container->singleton( RelationManager::class, function ( Container $c ) use ( $
     );
 } );
 
+$container->singleton( RelationManager::class, function ( Container $c ) use ( $allowedTables ): RelationManager {
+    return new RelationManager(
+        db: $c->get( SimplePdo::class ),
+        cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
+        generateJson: false,
+        allowedTables: $allowedTables,
+        columnAliases: [
+            'seller' => 'companies',
+            'buyer'  => 'companies',
+        ],
+        autoSync: true,
+    );
+} );
+
 $container->singleton( SchemaManager::class, function ( Container $c ) use ( $allowedTables ): SchemaManager {
     return new SchemaManager(
         db: $c->get( SimplePdo::class ),
