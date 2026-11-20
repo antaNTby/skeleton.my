@@ -19,7 +19,7 @@ final class TableSchema
         public array           $sortFields = [],
         public readonly array  $fieldTypes = [],
         public readonly array  $sqlTypes = [],
-        public array           $relations = [],
+        public readonly bool   $hasRelations = false,
     ) {
     }
 
@@ -38,7 +38,7 @@ final class TableSchema
             sortFields: array_values( $data['sort_fields'] ?? $fields ),
             fieldTypes: $data['field_types'] ?? [],
             sqlTypes: $data['sql_types'] ?? [],
-            relations: $data['relations'] ?? [],
+            hasRelations: (bool) ( $data['relations'] ?? false ),
         );
     }
 
@@ -57,7 +57,7 @@ final class TableSchema
             'sort_fields'      => $this->sortFields,
             'field_types'      => $this->fieldTypes,
             'sql_types'        => $this->sqlTypes,
-            'relations'        => $this->relations,
+            'relations'        => $this->hasRelations,
         ];
     }
 

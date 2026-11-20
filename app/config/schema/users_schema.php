@@ -98,7 +98,5 @@ return array (
     'created_at' => 'timestamp',
     'last_login' => 'datetime',
   ),
-  'relations' => 
-  array (
-  ),
+  'relations' => true,
 );

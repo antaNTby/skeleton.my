@@ -5,6 +5,7 @@ declare ( strict_types = 1 );
 namespace App\Controller;
 
 use App\Model\MySubModel;
+use App\Utils\Schema\RelationManager;
 use App\Utils\Schema\SchemaManager;
 use flight\database\SimplePdo;
 use flight\Engine;

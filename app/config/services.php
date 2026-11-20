@@ -16,6 +16,7 @@
 
 use App\Utils\Config;
 use App\Utils\DatabaseFactory;
+use App\Utils\Schema\RelationManager;
 use App\Utils\Schema\SchemaManager;
 use flight\Container;
 use flight\database\SimplePdo;
@@ -173,6 +174,21 @@ if ( $db instanceof SimplePdo ) {
 ####  'user_tokens',
 ####  'users'
 
+$allowedTables = [
+    '__dict_banks',
+    '__dict_opf',
+    'companies',
+    'company_bank_accounts',
+    'company_contacts',
+    'company_employees',
+    'orders',
+    'invoices',
+    'users',
+    'user_tokens',
+    'posts',
+    'audit_logs',
+];
+
 /*
  **Обычное обновление после миграций БД** (обновятся `fields`, `field_types`, `sql_types`, удалятся исчезнувшие колонки, но **сохранятся** ваши ручные `displayed_fields`, `filter_fields`, `search_fields`, `sort_fields` и `relations`):
   ```php
@@ -184,27 +200,26 @@ $this->schemaManager->syncAllTables(forceRefresh: true,  preserveCustom: false);
 ```
 */
 
-$container->singleton( SchemaManager::class, function ( Container $c ): SchemaManager {
-    return new SchemaManager(
+$container->singleton( RelationManager::class, function ( Container $c ) use ( $allowedTables ): RelationManager {
+    return new RelationManager(
         db: $c->get( SimplePdo::class ),
-        cacheDir: SCHEMA_DIR,
+        cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
         generateJson: false,
-        allowedTables: [
-            // '__dict_banks',
-            // '__dict_opf',
-            // 'audit_logs',
-            'companies',
-            'company_bank_accounts',
-            'company_contacts',
-            // 'company_employees',
-            // 'user_tokens',
-            'users',
-
-        ],
+        allowedTables: $allowedTables,
         autoSync: true,
     );
 } );
 
+$container->singleton( SchemaManager::class, function ( Container $c ) use ( $allowedTables ): SchemaManager {
+    return new SchemaManager(
+        db: $c->get( SimplePdo::class ),
+        relationManager: $c->get( RelationManager::class ),
+        cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
+        generateJson: false,
+        allowedTables: $allowedTables,
+        autoSync: true,
+    );
+} );
 $container->set( Route::class, function () use ( $app ) {
     return $app->router()->route( $app->request() );
 } );

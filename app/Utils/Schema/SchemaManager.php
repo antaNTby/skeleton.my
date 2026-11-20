@@ -22,12 +22,14 @@ class SchemaManager
      * @param array<string> $allowedTables Белый список таблиц (если пустой — сканируются все таблицы БД)
      * @param bool $autoSync Автоматически загружать/синхронизировать схемы при создании объекта
      */
+
     public function __construct(
-        private readonly SimplePdo $db,
-        ?string                    $cacheDir = null,
-        private readonly bool      $generateJson = false,
-        private readonly array     $allowedTables = [],
-        bool                       $autoSync = true,
+        private readonly SimplePdo       $db,
+        private readonly RelationManager $relationManager,
+        ?string                          $cacheDir = null,
+        private readonly bool            $generateJson = false,
+        private readonly array           $allowedTables = [],
+        bool                             $autoSync = true,
     ) {
         $this->cacheDir = rtrim(
             $cacheDir ?? ( CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema' ),
@@ -140,6 +142,19 @@ class SchemaManager
             $relations
         );
 
+        // $schema = new TableSchema(
+        //     tableName: $tableName,
+        //     primaryKey: $detectedPk,
+        //     fields: $fields,
+        //     displayedFields: $displayedFields,
+        //     filterFields: $filterFields,
+        //     searchFields: $searchFields,
+        //     sortFields: $sortFields,
+        //     fieldTypes: $fieldTypes,
+        //     sqlTypes: $sqlTypes,
+        //     relations: $mergedRelations,
+        // );
+
         $schema = new TableSchema(
             tableName: $tableName,
             primaryKey: $detectedPk,
@@ -150,7 +165,7 @@ class SchemaManager
             sortFields: $sortFields,
             fieldTypes: $fieldTypes,
             sqlTypes: $sqlTypes,
-            relations: $mergedRelations,
+            hasRelations: $this->relationManager->hasRelations( $tableName ),
         );
 
         $this->saveToCache( $schema );
@@ -187,8 +202,10 @@ class SchemaManager
                 $this->get( $tableName );
             }
         }
-
-        $this->buildInverseRelations();
+// В syncAllTables(bool $forceRefresh = false, bool $preserveCustom = true):
+        if ( $forceRefresh ) {
+            $this->relationManager->syncAll( $preserveCustom );
+        }
 
         return $this->schemas;
     }

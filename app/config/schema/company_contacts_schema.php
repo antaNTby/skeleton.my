@@ -98,15 +98,5 @@ return array (
     'is_primary' => 'tinyint(1)',
     'note' => 'varchar(255)',
   ),
-  'relations' => 
-  array (
-    'company' => 
-    array (
-      'type' => 'belongsTo',
-      'table' => 'companies',
-      'foreign_key' => 'company_id',
-      'owner_key' => 'id',
-      'display_field' => 'name',
-    ),
-  ),
+  'relations' => true,
 );

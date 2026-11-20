@@ -161,15 +161,5 @@ return array (
     'updated_at' => 'timestamp',
     'deleted_at' => 'datetime',
   ),
-  'relations' => 
-  array (
-    'opf' => 
-    array (
-      'type' => 'belongsTo',
-      'table' => '__dict_opf',
-      'foreign_key' => 'opf_id',
-      'owner_key' => 'id',
-      'display_field' => 'name',
-    ),
-  ),
+  'relations' => true,
 );
