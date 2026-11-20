@@ -16,6 +16,7 @@
 
 use App\Utils\Config;
 use App\Utils\DatabaseFactory;
+use App\Utils\Schema\SchemaManager;
 use flight\Container;
 use flight\database\SimplePdo;
 use flight\debug\tracy\TracyExtensionLoader;
@@ -157,6 +158,14 @@ if ( $db instanceof SimplePdo ) {
     $container->singleton( SimplePdo::class, $db );
 }
 
+$container->singleton( SchemaManager::class, function ( Container $c ): SchemaManager {
+    return new SchemaManager(
+        db: $c->get( SimplePdo::class ),
+        cacheDir: SCHEMA_DIR,
+        generateJson: true
+    );
+} );
+
 $container->set( Route::class, function () use ( $app ) {
     return $app->router()->route( $app->request() );
 } );
@@ -180,4 +189,4 @@ $app->map( 'make', function (
 
 $session->set( 'test_sess', $nonce );
 
-bdump( $container );
+bdump( $container->get( SchemaManager::class, [] ) );

@@ -5,6 +5,7 @@ declare ( strict_types = 1 );
 namespace App\Controller;
 
 use App\Model\MySubModel;
+use App\Utils\Schema\SchemaManager;
 use flight\database\SimplePdo;
 use flight\Engine;
 use flight\net\Request;
@@ -27,9 +28,12 @@ class MySubModelController
      * @param Engine<object> $app
      */
     public function __construct(
+
         Engine    $app,
         SimplePdo $db,
-        Route     $route // <-- Добавили получение роута из контейнера
+        Route     $route,
+        // <-- Добавили получение роута из контейнера
+        private readonly SchemaManager $schemaManager
 
     ) {
         $this->app       = $app;
@@ -37,7 +41,12 @@ class MySubModelController
         $this->tableName = $route->params['table_name'] ?? '';
 
         // Здесь ваш код
-        bdump( 'Вы запросили таблицу: ' . htmlspecialchars( $this->tableName ) );
+    }
+
+    public function sync(): void
+    {
+        $allSchemas = $this->schemaManager->syncAllTables( forceRefresh: true );
+        Flight::json( ['synced' => array_keys( $allSchemas )] );
     }
 
     public function index(): void
@@ -45,8 +54,6 @@ class MySubModelController
         $subModel = new MySubModel( $this->db, $this->tableName );
         $rows     = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
         // dd( $rows );
-
-        bdump( 'Список из таблицы: ' . htmlspecialchars( $this->tableName ), 'INDEX' );
 
         $this->_render( 'index', ['rows' => $rows] );
     }
