@@ -148,4 +148,33 @@ final class TableSchema
             default => (string) $value,
         };
     }
+
+################## RELATIONS
+
+    // Внутри class TableSchema:
+
+    public function hasRelation( string $name ): bool
+    {
+        return isset( $this->relations[$name] );
+    }
+
+    public function getRelation( string $name ): ?array
+    {
+        return $this->relations[$name] ?? null;
+    }
+
+/**
+ * Найти связь по имени колонки внешнего ключа (например, для 'company_id' вернёт конфиг связи 'company')
+ */
+    public function getRelationByForeignKey( string $columnName ): ?array
+    {
+        foreach ( $this->relations as $name => $config ) {
+            if ( ( $config['type'] ?? '' ) === 'belongsTo' && ( $config['foreign_key'] ?? '' ) === $columnName ) {
+                return ['name' => $name, ...$config];
+            }
+        }
+
+        return null;
+    }
+
 }

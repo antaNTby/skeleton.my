@@ -15,16 +15,28 @@ class SchemaManager
 
     private string $cacheDir;
 
+    /**
+     * @param SimplePdo $db Экземпляр подключения к БД
+     * @param string|null $cacheDir Путь к папке кэша схем
+     * @param bool $generateJson Генерировать ли дубликат схемы в JSON
+     * @param array<string> $allowedTables Белый список таблиц (если пустой — сканируются все таблицы БД)
+     * @param bool $autoSync Автоматически загружать/синхронизировать схемы при создании объекта
+     */
     public function __construct(
         private readonly SimplePdo $db,
         ?string                    $cacheDir = null,
         private readonly bool      $generateJson = false,
+        private readonly array     $allowedTables = [],
+        bool                       $autoSync = true,
     ) {
         $this->cacheDir = rtrim(
             $cacheDir ?? ( CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema' ),
             DIRECTORY_SEPARATOR
         );
 
+        if ( $autoSync ) {
+            $this->syncAllTables( forceRefresh: false );
+        }
     }
 
     /**
@@ -35,6 +47,10 @@ class SchemaManager
         string $primaryKey = 'id',
         array  $relations = []
     ): TableSchema {
+        if ( !empty( $this->allowedTables ) && !in_array( $tableName, $this->allowedTables, true ) ) {
+            throw new RuntimeException( "Access to table schema '{$tableName}' is not in the allowed list." );
+        }
+
         if ( isset( $this->schemas[$tableName] ) ) {
             return $this->schemas[$tableName];
         }
@@ -42,7 +58,7 @@ class SchemaManager
         $schema = $this->loadFromCache( $tableName );
 
         if ( $schema === null ) {
-            $schema = $this->syncTable( $tableName, $primaryKey, $relations );
+            $schema = $this->syncTable( $tableName, $primaryKey, $relations, preserveCustom: true );
         } elseif ( !empty( $relations ) ) {
             $schema->relations = array_merge( $schema->relations, $relations );
         }
@@ -54,20 +70,28 @@ class SchemaManager
 
     /**
      * Синхронизировать конкретную таблицу с БД и сохранить в кэш
+     *
+     * @param bool $preserveCustom Сохранять ли ручные правки (displayed_fields, filter_fields и др.) из существующего файла
      */
     public function syncTable(
         string $tableName,
         string $primaryKey = 'id',
-        array  $relations = []
+        array  $relations = [],
+        bool   $preserveCustom = true
     ): TableSchema {
+        if ( !empty( $this->allowedTables ) && !in_array( $tableName, $this->allowedTables, true ) ) {
+            throw new RuntimeException( "Table '{$tableName}' is not allowed for schema sync." );
+        }
+
         $this->ensureCacheDir();
 
-        // Защита от SQL-инъекций в имени таблицы
         if ( !preg_match( '/^[a-zA-Z0-9_]+$/', $tableName ) ) {
             throw new RuntimeException( "Invalid table name: {$tableName}" );
         }
 
-        // Нативный метод SimplePdo::fetchAll()
+        // Читаем старую схему до запроса к БД, чтобы сохранить ручные правки
+        $existingSchema = $preserveCustom ? $this->loadFromCache( $tableName ) : null;
+
         $columns = $this->db->fetchAll( "DESCRIBE `{$tableName}`" );
 
         if ( empty( $columns ) ) {
@@ -92,50 +116,79 @@ class SchemaManager
             $fieldTypes[$fieldName] = $this->detectPhpType( $typeRaw );
         }
 
+        // Слияние с существующими ручными настройками (удаляем только несуществующие в БД колонки)
+        if ( $existingSchema !== null ) {
+            $displayedFields = $this->filterExistingFields( $existingSchema->displayedFields, $fields );
+            $filterFields    = $this->filterExistingFields( $existingSchema->filterFields, $fields );
+            $searchFields    = $this->filterExistingFields( $existingSchema->searchFields, $fields );
+            $sortFields      = $this->filterExistingFields( $existingSchema->sortFields, $fields );
+            $mergedRelations = array_merge( $existingSchema->relations, $relations );
+        } else {
+            $displayedFields = $fields;
+            $filterFields    = $fields;
+            $searchFields    = $fields;
+            $sortFields      = $fields;
+            $mergedRelations = $relations;
+        }
+
+// Внутри syncTable() перед созданием new TableSchema(...):
+        $autoRelations = $this->detectDbRelations( $tableName );
+
+        $mergedRelations = array_replace_recursive(
+            $autoRelations,
+            $existingSchema?->relations ?? [],
+            $relations
+        );
+
         $schema = new TableSchema(
             tableName: $tableName,
             primaryKey: $detectedPk,
             fields: $fields,
-            displayedFields: $fields,
-            filterFields: $fields,
-            searchFields: $fields,
-            sortFields: $fields,
+            displayedFields: $displayedFields,
+            filterFields: $filterFields,
+            searchFields: $searchFields,
+            sortFields: $sortFields,
             fieldTypes: $fieldTypes,
             sqlTypes: $sqlTypes,
-            relations: $relations,
+            relations: $mergedRelations,
         );
 
         $this->saveToCache( $schema );
         $this->schemas[$tableName] = $schema;
-        dd( $this );
 
         return $schema;
     }
 
     /**
-     * Сканировать всю базу данных и построить коллекцию схем всех таблиц
+     * Синхронизировать все разрешённые таблицы (или всю БД, если белый список пуст)
      *
+     * @param bool $forceRefresh Принудительно перечитать структуру из БД
+     * @param bool $preserveCustom Сохранить ли ручные правки в списках полей при пересинхронизации
      * @return array<string, TableSchema>
      */
-    public function syncAllTables( bool $forceRefresh = false ): array
-    {
-        // Нативный метод SimplePdo::fetchAll() (возвращает массив строк вида ['Tables_in_dbname' => 'users'])
-        $rows = $this->db->fetchAll( 'SHOW TABLES' );
+    public function syncAllTables(
+        bool $forceRefresh = false,
+        bool $preserveCustom = true
+    ): array {
+        $tables = !empty( $this->allowedTables )
+        ? $this->allowedTables
+        : $this->fetchAllDbTableNames();
 
-        foreach ( $rows as $row ) {
-            $data      = is_array( $row ) ? $row : $row->getData();
-            $tableName = (string) reset( $data );
-
+        foreach ( $tables as $tableName ) {
+            $tableName = (string) $tableName;
             if ( $tableName === '' ) {
                 continue;
             }
 
             if ( $forceRefresh ) {
-                $this->clearCache( $tableName );
+                unset( $this->schemas[$tableName] );
+                $this->syncTable( $tableName, preserveCustom: $preserveCustom );
+            } else {
+                $this->get( $tableName );
             }
-
-            $this->get( $tableName );
         }
+
+        $this->buildInverseRelations();
 
         return $this->schemas;
     }
@@ -155,6 +208,9 @@ class SchemaManager
         return isset( $this->schemas[$tableName] ) || file_exists( $this->getPhpCachePath( $tableName ) );
     }
 
+    /**
+     * Полностью удалить файлы кэша с диска (без сохранения ручных настроек)
+     */
     public function clearCache( ?string $tableName = null ): bool
     {
         if ( $tableName !== null ) {
@@ -177,6 +233,40 @@ class SchemaManager
         }
 
         return true;
+    }
+
+    /**
+     * Оставляет только те поля из пользовательского списка, которые всё ещё существуют в БД.
+     * Если пользователь намеренно оставил список пустым ([]), пустой массив сохранится.
+     *
+     * @param array<string> $customFields
+     * @param array<string> $actualDbFields
+     * @return array<string>
+     */
+    private function filterExistingFields(
+        array $customFields,
+        array $actualDbFields
+    ): array {
+        return array_values( array_intersect( $customFields, $actualDbFields ) );
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function fetchAllDbTableNames(): array
+    {
+        $rows   = $this->db->fetchAll( 'SHOW TABLES' );
+        $tables = [];
+
+        foreach ( $rows as $row ) {
+            $data = is_array( $row ) ? $row : $row->getData();
+            $name = (string) reset( $data );
+            if ( $name !== '' ) {
+                $tables[] = $name;
+            }
+        }
+
+        return $tables;
     }
 
     private function loadFromCache( string $tableName ): ?TableSchema
@@ -232,11 +322,9 @@ class SchemaManager
             throw $e;
         }
     }
-
     private function detectPhpType( string $sqlType ): string
     {
         $sqlType = strtolower( $sqlType );
-
         if ( str_contains( $sqlType, 'tinyint(1)' ) || str_contains( $sqlType, 'bool' ) ) {
             return 'bool';
         }
@@ -252,21 +340,117 @@ class SchemaManager
 
         return 'string';
     }
-
     private function getPhpCachePath( string $tableName ): string
     {
         return $this->cacheDir . DIRECTORY_SEPARATOR . $tableName . '_schema.php';
     }
-
     private function getJsonCachePath( string $tableName ): string
     {
         return $this->cacheDir . DIRECTORY_SEPARATOR . $tableName . '_schema.json';
     }
-
     private function ensureCacheDir(): void
     {
         if ( !is_dir( $this->cacheDir ) && !@mkdir( $this->cacheDir, 0777, true ) && !is_dir( $this->cacheDir ) ) {
             throw new RuntimeException( "Failed to create schema cache directory: {$this->cacheDir}" );
         }
     }
+
+##########RELATIONS
+
+    /**
+     * Автоматически извлекает связи belongsTo из внешних ключей MySQL
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function detectDbRelations( string $tableName ): array
+    {
+        $sql = '
+        SELECT
+            COLUMN_NAME AS foreign_key,
+            REFERENCED_TABLE_NAME AS ref_table,
+            REFERENCED_COLUMN_NAME AS owner_key
+        FROM information_schema.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+          AND REFERENCED_TABLE_NAME IS NOT NULL
+    ';
+
+        $rows      = $this->db->fetchAll( $sql, [$tableName] );
+        $relations = [];
+
+        foreach ( $rows as $row ) {
+            $fk       = (string) $row['foreign_key'];
+            $refTable = (string) $row['ref_table'];
+            $ownerKey = (string) $row['owner_key'];
+
+            // Генерируем имя связи из foreign_key (например, 'company_id' -> 'company')
+            $relationName = str_ends_with( $fk, '_id' )
+            ? substr( $fk, 0, -3 )
+            : $refTable;
+
+            $relations[$relationName] = [
+                'type'          => 'belongsTo',
+                'table'         => $refTable,
+                'foreign_key'   => $fk,
+                'owner_key'     => $ownerKey,
+                'display_field' => 'name', // значение по умолчанию для выпадающих списков
+            ];
+        }
+
+        return $relations;
+    }
+
+/**
+ * Вызывается в конце syncAllTables() после загрузки всех схем
+ */
+    private function buildInverseRelations(): void
+    {
+        foreach ( $this->schemas as $childTable => $childSchema ) {
+            foreach ( $childSchema->relations as $relName => $relConfig ) {
+                if ( ( $relConfig['type'] ?? '' ) !== 'belongsTo' ) {
+                    continue;
+                }
+
+                $parentTable = $relConfig['table'] ?? '';
+                $fk          = $relConfig['foreign_key'] ?? '';
+                $ownerKey    = $relConfig['owner_key'] ?? 'id';
+
+                if ( !isset( $this->schemas[$parentTable] ) ) {
+                    continue;
+                }
+
+                $parentSchema = $this->schemas[$parentTable];
+
+                                                                  // Убираем префикс родительской таблицы: 'company_contacts' -> 'contacts'
+                $prefix         = rtrim( $parentTable, 's' ) . '_'; // 'companie_' -> лучше проверять явно:
+                $singularParent = match ( $parentTable ) {
+                    'companies' => 'company_',
+                    'users'     => 'user_',
+                    default     => rtrim( $parentTable, 's' ) . '_',
+                };
+
+                $inverseName = str_starts_with( $childTable, $singularParent )
+                ? substr( $childTable, strlen( $singularParent ) )
+                : $childTable;
+
+                // Если на одну таблицу ссылаются несколько ключей (seller_id, buyer_id -> orders)
+                if ( isset( $parentSchema->relations[$inverseName] )
+                    && ( $parentSchema->relations[$inverseName]['foreign_key'] ?? '' ) !== $fk
+                ) {
+                    $inverseName = $childTable . '_as_' . $relName; // 'orders_as_seller', 'orders_as_buyer'
+                }
+
+                // Добавляем только если не переопределено вручную
+                if ( !isset( $parentSchema->relations[$inverseName] ) ) {
+                    $parentSchema->relations[$inverseName] = [
+                        'type'        => 'hasMany',
+                        'table'       => $childTable,
+                        'foreign_key' => $fk,
+                        'owner_key'   => $ownerKey,
+                    ];
+                }
+            }
+        }
+    }
+
 }

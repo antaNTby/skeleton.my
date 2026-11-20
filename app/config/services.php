@@ -158,11 +158,50 @@ if ( $db instanceof SimplePdo ) {
     $container->singleton( SimplePdo::class, $db );
 }
 
+####  '__dict_banks',
+####  '__dict_opf',
+####  '_migrations',
+####  'audit_logs',
+####  'companies',
+####  'company_bank_accounts',
+####  'company_contacts',
+####  'company_employees',
+####  'invoices',
+####  'logs',
+####  'orders',
+####  'posts',
+####  'user_tokens',
+####  'users'
+
+/*
+ **Обычное обновление после миграций БД** (обновятся `fields`, `field_types`, `sql_types`, удалятся исчезнувшие колонки, но **сохранятся** ваши ручные `displayed_fields`, `filter_fields`, `search_fields`, `sort_fields` и `relations`):
+  ```php
+  $this->schemaManager->syncAllTables(forceRefresh: true);
+  ```
+• Полный сброс схемы к дефолтному состоянию (если нужно затереть ручные правки и снова включить все поля таблицы):
+```php
+$this->schemaManager->syncAllTables(forceRefresh: true,  preserveCustom: false);
+```
+*/
+
 $container->singleton( SchemaManager::class, function ( Container $c ): SchemaManager {
     return new SchemaManager(
         db: $c->get( SimplePdo::class ),
         cacheDir: SCHEMA_DIR,
-        generateJson: true
+        generateJson: false,
+        allowedTables: [
+            // '__dict_banks',
+            // '__dict_opf',
+            // 'audit_logs',
+            'companies',
+            'company_bank_accounts',
+            'company_contacts',
+            // 'company_employees',
+            // 'user_tokens',
+            'users',
+
+        ],
+        autoSync: true,
     );
 } );
 
