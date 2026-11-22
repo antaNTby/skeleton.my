@@ -12,9 +12,39 @@ use App\Controller\CompanyController;
 use App\Controller\HomeController;
 use App\Controller\MySubModelController;
 use App\Controller\PostController;
+use App\Controller\SchemaVisualizerController;
 use App\Middleware\SecurityHeadersMiddleware;
 use App\Utils\DatabaseFactory;
-use flight\net\Router;
+use App\Utils\Schema\RelationManager;
+
+##### // 1. Страница визуализации (можно ограничить только для dev-окружения)
+##### Flight::route( 'GET /dev/schema-map', function () use ( $container ) {
+#####     /** @var SchemaManager $schemaManager */
+#####     $schemaManager = $container->get( SchemaManager::class );
+#####     /** @var RelationManager $relationManager */
+#####     $relationManager = $container->get( RelationManager::class );
+#####
+#####     $mermaidCode = buildMermaidErDiagram( $schemaManager, $relationManager );
+#####     $tablesData  = [];
+#####
+#####     foreach ( $schemaManager->all() as $tableName => $schema ) {
+#####         $tablesData[$tableName] = [
+#####             'schema'    => $schema->toArray(),
+#####             'relations' => $relationManager->forTable( $tableName ),
+#####         ];
+#####     }
+#####
+#####     // Отдаём автономную HTML-страницу (можно вынести в Latte / PHP-шаблон)
+#####     renderSchemaVisualizerView( $mermaidCode, $tablesData );
+##### } );
+
+use App\Utils\Schema\SchemaManager;
+
+Flight::route( 'GET /dev/schema-map', [SchemaVisualizerController::class, 'index'] );
+Flight::route( 'POST /dev/schema-map/sync', [SchemaVisualizerController::class, 'sync'] );use flight\net\Router;
+
+Flight::route( 'GET /dev/schema-map', [SchemaVisualizerController::class, 'index'] );
+Flight::route( 'POST /dev/schema-map/sync', [SchemaVisualizerController::class, 'sync'] );
 
 $router->group( '', function ( Router $router ) use ( $config ) {
     $router->get( '/', [HomeController::class, 'index'] );

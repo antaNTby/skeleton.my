@@ -153,7 +153,9 @@ class RelationManager
     ): ?array {
         return $this->forTable( $tableName )[$relationName] ?? null;
     }
-
+/**
+ * Найти связь по имени колонки внешнего ключа (например, для 'company_id' вернёт конфиг связи 'company')
+ */
     public function findByForeignKey(
         string $tableName,
         string $columnName

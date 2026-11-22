@@ -1,0 +1,124 @@
+<?php
+
+declare ( strict_types = 1 );
+
+namespace App\Controller;
+
+use App\Utils\Schema\RelationManager;
+use App\Utils\Schema\SchemaManager;
+use Flight;
+use Smarty\Smarty;
+
+class SchemaVisualizerController
+{
+    public function __construct(
+        private readonly SchemaManager   $schemaManager,
+        private readonly RelationManager $relationManager,
+        private readonly Smarty          $smarty,
+    ) {
+    }
+
+    /**
+     * GET /dev/schema-map
+     */
+    public function index(): void
+    {
+        $schemas = $this->schemaManager->all();
+        $tables  = [];
+
+        foreach ( $schemas as $tableName => $schema ) {
+            $relations = $this->relationManager->forTable( $tableName );
+            $fkColumns = [];
+
+            foreach ( $relations as $rel ) {
+                if ( ( $rel['type'] ?? '' ) === 'belongsTo' && !empty( $rel['foreign_key'] ) ) {
+                    $fkColumns[$rel['foreign_key']] = $rel['source'] ?? 'foreign_key';
+                }
+            }
+
+            $tables[$tableName] = [
+                'name'            => $tableName,
+                'primaryKey'      => $schema->primaryKey,
+                'fields'          => $schema->fields,
+                'displayedFields' => $schema->displayedFields,
+                'filterFields'    => $schema->filterFields,
+                'fieldTypes'      => $schema->fieldTypes,
+                'sqlTypes'        => $schema->sqlTypes,
+                'fkColumns'       => $fkColumns,
+                'hasRelations'    => $schema->hasRelations,
+                'relations'       => $relations,
+            ];
+        }
+
+        $this->smarty->assign( [
+            'pageTitle'   => 'Визуализация схемы БД и связей',
+            'mermaidCode' => $this->buildMermaidDiagram( $tables ),
+            'tables'      => $tables,
+            'totalTables' => count( $tables ),
+            'synced'      => isset( $_GET['synced'] ),
+        ] );
+
+        $this->smarty->display( 'dev/schema_map.tpl' );
+    }
+
+    /**
+     * POST /dev/schema-map/sync
+     */
+    public function sync(): void
+    {
+        $this->schemaManager->syncAllTables( forceRefresh: true, preserveCustom: true );
+        Flight::redirect( '/dev/schema-map?synced=1' );
+    }
+
+    /**
+     * Генерирует синтаксис ER-диаграммы для Mermaid.js
+     *
+     * @param array<string, array<string, mixed>> $tables
+     */
+    private function buildMermaidDiagram( array $tables ): string
+    {
+        $lines = ['erDiagram'];
+
+        // 1. Сущности и колонки
+        foreach ( $tables as $tableName => $table ) {
+            $lines[] = "    {$tableName} {";
+
+            foreach ( $table['fields'] as $field ) {
+                $phpType = $table['fieldTypes'][$field] ?? 'mixed';
+                $marker  = '';
+
+                if ( $field === $table['primaryKey'] ) {
+                    $marker = ' PK';
+                } elseif ( isset( $table['fkColumns'][$field] ) ) {
+                    $marker = ' FK';
+                }
+
+                $lines[] = "        {$phpType} {$field}{$marker}";
+            }
+
+            $lines[] = '    }';
+        }
+
+        // 2. Связи (только belongsTo, чтобы линии не дублировались с hasMany)
+        foreach ( $tables as $childTable => $table ) {
+            foreach ( $table['relations'] as $relName => $rel ) {
+                if ( ( $rel['type'] ?? '' ) !== 'belongsTo' ) {
+                    continue;
+                }
+
+                $parentTable = $rel['table'] ?? '';
+                if ( !isset( $tables[$parentTable] ) ) {
+                    continue;
+                }
+
+                $fk        = $rel['foreign_key'] ?? '';
+                $source    = $rel['source'] ?? 'foreign_key';
+                $connector = ( $source === 'foreign_key' ) ? '||--o{' : '||..o{';
+
+                $lines[] = "    {$parentTable} {$connector} {$childTable} : \"{$relName} ({$fk})\"";
+            }
+        }
+
+        return implode( "\n", $lines );
+    }
+}
