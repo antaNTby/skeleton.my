@@ -63,14 +63,11 @@ return array (
   array (
     0 => 'id',
     1 => 'company_id',
-    2 => 'address_type',
-    3 => 'address_text',
-    4 => 'phone',
-    5 => 'email',
-    6 => 'other',
-    7 => 'contact_person',
-    8 => 'is_primary',
-    9 => 'note',
+    2 => 'email',
+    3 => 'other',
+    4 => 'contact_person',
+    5 => 'is_primary',
+    6 => 'note',
   ),
   'field_types' => 
   array (

@@ -58,11 +58,11 @@
     </footer>
     {/block}
     {* *}
+
+    {block SCRIPTS}
     {* Bootstrap JS *}
     <script src="/lib/bootstrap/js/bootstrap.bundle.min.js" nonce="{$nonce}"></script>
     {* Дополнительные скрипты *}
-
-    {block SCRIPTS}
     {* Подключаем основной файл как модуль (если он нужен для побочных эффектов) *}
     <script type="module" src="/lib/js/admin_ui.js" nonce="{$nonce}"></script>
     <script type="module" src="/lib/js/admin.js" nonce="{$nonce}"></script>

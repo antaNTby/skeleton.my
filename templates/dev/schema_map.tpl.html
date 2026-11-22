@@ -1,45 +1,40 @@
 {extends file='layout.tpl.html'}
 {block FOOTER}{/block}
 {block ASIDE}{/block}
-{block MAIN}
-<div class="py-3">
+{block CONTAINER}
+<div class="container-fluid bg-body-secondary" style="max-width: 2200px;">
     {* Шапка с легендой и кнопкой пересинхронизации *}
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 pb-2 border-bottom bg-white">
-        <div class="">
-            <h1 class="h4 mb-1">{$pageTitle|escape}</h1>
-            <div class="small text-body-secondary d-flex flex-wrap gap-3">
-                <span><strong class="text-primary">━━</strong> Жёсткий FK (<code>relations_map</code>)</span>
-                <span><strong class="text-danger-emphasis">╌╌</strong> Неявный *_id (<code>relations_id</code>)</span>
-            </div>
-        </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 my-0">
+        <h1 class="h1">{$pageTitle|escape}</h1>
         <a class="btn-link link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/dev/schema-diagram">
             <i class="bi bi-diagram-2"></i> Диаграма БД и связи </a>
-        <form method="post" action="/dev/schema-map/sync" class="m-0">
+        <form method="post" action="/dev/schema-map/sync" class="m-0 mb-1">
             <button type="submit" class="btn btn-primary btn-sm">
                 ↻ Пересинхронизировать схемы
             </button>
         </form>
     </div>
+<div class="mb-5">
+    {* Блок 2: Заголовок и фильтр карточек *}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-1">
+        <h2 class="h5 mb-0">Структура таблиц и связи</h2>
+        <div class="" style="width: 280px;">
+            <input type="search" id="tableFilter" class="form-control form-control-sm" placeholder="Фильтр по названию таблицы...">
+        </div>
+    </div>
     {if $synced}
-    <div class="alert alert-success alert-dismissible fade show py-2 small" role="alert">
+    <div class="alert alert-success alert-dismissible fade show m-2 py-2 small" role="alert">
         Схемы таблиц и карта связей успешно обновлены из базы данных (ручные настройки сохранены).
         <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {/if}
-    {* Блок 2: Заголовок и фильтр карточек *}
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h2 class="h5 mb-0">Структура таблиц и связи</h2>
-        <div style="width: 280px;">
-            <input type="search" id="tableFilter" class="form-control form-control-sm" placeholder="Фильтр по названию таблицы...">
-        </div>
-    </div>
     {* Сетка карточек таблиц на Bootstrap Grid *}
     {block TABLES_GRID}
-    {include file="dev/TABLES_GRID.tpl" }
+    {include file="dev/TABLES_GRID.tpl.html" }
     {/block}
 </div>
+</div>
 {/block}
-
 
 
 
@@ -49,6 +44,7 @@
     {$smarty.block.parent}
 
     <script nonce="{$nonce}">
+    {literal}
         document.getElementById('tableFilter')?.addEventListener('input', function (e) {
             const query = e.target.value.toLowerCase().trim();
             document.querySelectorAll('#tablesGrid .table-card-col').forEach(col => {
@@ -56,6 +52,7 @@
                 col.classList.toggle('d-none', !name.includes(query));
             });
         });
+    {/literal}
     </script>
 
 
@@ -79,12 +76,12 @@
 
         if (btn && !btn.disabled) {
             if (isDirty) {
-                btn.classList.remove('btn-outline-primary', 'btn-success', 'btn-outline-danger');
+                btn.classList.remove('btn-outline-light', 'btn-success', 'btn-outline-danger');
                 btn.classList.add('btn-danger', 'text-dark', 'fw-semibold');
                 btn.textContent = 'Сохранить';
             } else {
                 btn.classList.remove('btn-danger', 'text-dark', 'fw-semibold', 'btn-outline-danger');
-                btn.classList.add('btn-outline-primary');
+                btn.classList.add('btn-outline-light');
                 btn.textContent = 'Сохранить';
             }
         }
@@ -142,7 +139,7 @@
         if (btn) {
             btn.disabled = true;
             btn.classList.remove('btn-danger', 'text-dark', 'fw-semibold');
-            btn.classList.add('btn-outline-primary');
+            btn.classList.add('btn-outline-light');
             btn.textContent = 'Сохранение...';
         }
 
@@ -167,7 +164,7 @@
             form.classList.remove('border-danger', 'border-2');
 
             if (btn) {
-                btn.classList.remove('btn-outline-primary', 'btn-outline-danger');
+                btn.classList.remove('btn-outline-light', 'btn-outline-danger');
                 btn.classList.add('btn-success');
                 btn.textContent = '✓ Сохранено';
 
@@ -180,7 +177,7 @@
         } catch (err) {
             console.error(err);
             if (btn) {
-                btn.classList.remove('btn-outline-primary');
+                btn.classList.remove('btn-outline-light');
                 btn.classList.add('btn-outline-danger');
                 btn.textContent = 'Ошибка!';
                 btn.disabled = false;

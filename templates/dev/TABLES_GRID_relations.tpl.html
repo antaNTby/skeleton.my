@@ -1,0 +1,22 @@
+<div class="p-1 bg-body-tertiary pt-2 pb-2">
+    <div class="small fw-semibold text-body-secondary mb-1">
+        Связи ({$table.relations|count}):
+    </div>
+    <div class="d-flex flex-wrap gap-1 font-monospace" style="font-size: 0.75rem;">
+        {foreach $table.relations as $relName => $rel}
+        {if $rel.type === 'hasMany'}
+        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle text-wrap text-start" title="Обратная связь (1:N)">
+            hasMany: {$relName|escape} → {$rel.table|escape}.{$rel.foreign_key|escape}
+        </span>
+        {elseif ($rel.source|default:'') === 'implicit_id'}
+        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle text-wrap text-start" title="Неявная связь *_id (display: {$rel.display_field|default:'id'|escape})">
+            belongsTo: {$relName|escape} → {$rel.table|escape} ({$rel.foreign_key|escape})
+        </span>
+        {else}
+        <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle text-wrap text-start" title="Жёсткий FOREIGN KEY (display: {$rel.display_field|default:'id'|escape})">
+            belongsTo: {$relName|escape} → {$rel.table|escape} ({$rel.foreign_key|escape})
+        </span>
+        {/if}
+        {/foreach}
+    </div>
+</div>

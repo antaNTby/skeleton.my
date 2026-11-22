@@ -1,0 +1,38 @@
+{foreach $table.fields as $field}
+  <tr class="">
+    <td class="ps-3 py-1">
+        {$field|escape}
+        {if $field === $table.primaryKey}
+        <span class="badge text-bg-warning ms-1" title="Primary Key">PK</span>
+        {/if}
+        {if isset($table.fkColumns[$field])}
+        {if $table.fkColumns[$field] === 'foreign_key'}
+        <span class="badge text-bg-primary ms-1" title="Строгий FOREIGN KEY">FK</span>
+        {else}
+        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" title="Неявная связь *_id">ID</span>
+        {/if}
+        {/if}
+    </td>
+
+    <td class="py-1 user-select-none  text-end text-nowrap">
+        <span class="fw-semibold text-body">{$table.fieldTypes[$field]|default:'mixed'|escape}</span>
+        <span class="text-body-secondary">({$table.sqlTypes[$field]|default:''|escape})</span>
+    </td>
+
+    <td class="py-1 user-select-none  text-center">
+        <input class="form-check-input m-0" type="checkbox" name="displayed_fields[]" data-col-item="displayed" value="{$field|escape}"{if isset($table.displayedMap[$field])} checked{/if}>
+    </td>
+
+    <td class="py-1 user-select-none  text-center">
+    <input class="form-check-input m-0" type="checkbox" name="filter_fields[]" data-col-item="filter" value="{$field|escape}"{if isset($table.filterMap[$field])} checked{/if}>
+    </td>
+
+    <td class="py-1 user-select-none  text-center">
+    <input class="form-check-input m-0" type="checkbox" name="search_fields[]" data-col-item="search" value="{$field|escape}"{if isset($table.searchMap[$field])} checked{/if}>
+    </td>
+
+    <td class="py-1 user-select-none pe-3 text-center">
+    <input class="form-check-input m-0" type="checkbox" name="sort_fields[]" data-col-item="sort" value="{$field|escape}"{if isset($table.sortMap[$field])} checked{/if}>
+    </td>
+  </tr>
+{/foreach}

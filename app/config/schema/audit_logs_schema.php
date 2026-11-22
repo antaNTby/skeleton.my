@@ -24,8 +24,6 @@ return array (
     2 => 'record_id',
     3 => 'action',
     4 => 'user_id',
-    5 => 'payload',
-    6 => 'created_at',
   ),
   'filter_fields' => 
   array (

@@ -39,15 +39,11 @@ return array (
   array (
     0 => 'id',
     1 => 'company_id',
-    2 => 'iban',
-    3 => 'bic',
-    4 => 'bank_name',
-    5 => 'currency',
-    6 => 'is_primary',
-    7 => 'is_active',
-    8 => 'note',
-    9 => 'created_at',
-    10 => 'updated_at',
+    2 => 'bic',
+    3 => 'currency',
+    4 => 'is_primary',
+    5 => 'is_active',
+    6 => 'updated_at',
   ),
   'search_fields' => 
   array (
@@ -55,12 +51,11 @@ return array (
     1 => 'company_id',
     2 => 'iban',
     3 => 'bic',
-    4 => 'bank_name',
-    5 => 'currency',
-    6 => 'is_active',
-    7 => 'note',
-    8 => 'created_at',
-    9 => 'updated_at',
+    4 => 'currency',
+    5 => 'is_active',
+    6 => 'note',
+    7 => 'created_at',
+    8 => 'updated_at',
   ),
   'sort_fields' => 
   array (

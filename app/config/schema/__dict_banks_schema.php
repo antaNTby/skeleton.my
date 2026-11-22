@@ -25,11 +25,8 @@ return array (
     1 => 'bank_name',
     2 => 'bic_code',
     3 => 'unp',
-    4 => 'address',
-    5 => 'phone_fax',
-    6 => 'website',
-    7 => 'is_deprecated',
-    8 => 'note',
+    4 => 'phone_fax',
+    5 => 'website',
   ),
   'filter_fields' => 
   array (
@@ -53,7 +50,6 @@ return array (
     5 => 'phone_fax',
     6 => 'website',
     7 => 'is_deprecated',
-    8 => 'note',
   ),
   'sort_fields' => 
   array (
@@ -62,10 +58,9 @@ return array (
     2 => 'bic_code',
     3 => 'unp',
     4 => 'address',
-    5 => 'phone_fax',
-    6 => 'website',
-    7 => 'is_deprecated',
-    8 => 'note',
+    5 => 'website',
+    6 => 'is_deprecated',
+    7 => 'note',
   ),
   'field_types' => 
   array (
