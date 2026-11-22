@@ -9,7 +9,7 @@
             <h1 class="h4 mb-1">{$pageTitle|escape}</h1>
             <div class="small text-body-secondary d-flex flex-wrap gap-3">
                 <span><strong class="text-primary">━━</strong> Жёсткий FK (<code>relations_map</code>)</span>
-                <span><strong class="text-warning-emphasis">╌╌</strong> Неявный *_id (<code>relations_id</code>)</span>
+                <span><strong class="text-danger-emphasis">╌╌</strong> Неявный *_id (<code>relations_id</code>)</span>
             </div>
         </div>
         <form method="post" action="/dev/schema-map/sync" class="m-0">
@@ -82,8 +82,39 @@
 
     </script>
 
+
 <script nonce="{$nonce}">
 {literal}
+    // 1. Снимок состояния всех чекбоксов внутри конкретной формы
+    function getFormSnapshot(form) {
+        return Array.from(form.querySelectorAll('input[type="checkbox"][name]'))
+            .map(cb => cb.name + ':' + cb.value + '=' + (cb.checked ? '1' : '0'))
+            .join('|');
+    }
+
+    // 2. Проверка наличия несохранённых изменений и подсветка карточки/кнопки
+    function updateDirtyState(form) {
+        if (!form) return;
+        const isDirty = getFormSnapshot(form) !== form.dataset.initialState;
+        const btn = form.querySelector('button[type="submit"]');
+
+        form.classList.toggle('border-danger', isDirty);
+        form.classList.toggle('border-2', isDirty);
+
+        if (btn && !btn.disabled) {
+            if (isDirty) {
+                btn.classList.remove('btn-outline-primary', 'btn-success', 'btn-outline-danger');
+                btn.classList.add('btn-danger', 'text-dark', 'fw-semibold');
+                btn.textContent = 'Сохранить';
+            } else {
+                btn.classList.remove('btn-danger', 'text-dark', 'fw-semibold', 'btn-outline-danger');
+                btn.classList.add('btn-outline-primary');
+                btn.textContent = 'Сохранить';
+            }
+        }
+    }
+
+    // 3. Синхронизация мастер-чекбокса в шапке колонки
     function syncMasterCheckbox(tableEl, colName) {
         const master = tableEl.querySelector('.js-toggle-col[data-col="' + colName + '"]');
         const items  = Array.from(tableEl.querySelectorAll('input[data-col-item="' + colName + '"]'));
@@ -94,14 +125,21 @@
         master.indeterminate = checkedCount > 0 && checkedCount < items.length;
     }
 
-    document.querySelectorAll('#tablesGrid table').forEach(tableEl => {
-        ['displayed', 'filter', 'search', 'sort'].forEach(col => syncMasterCheckbox(tableEl, col));
+    // Инициализация при загрузке страницы: запоминаем эталонное состояние каждой карточки
+    document.querySelectorAll('#tablesGrid form').forEach(form => {
+        form.dataset.initialState = getFormSnapshot(form);
+        const tableEl = form.querySelector('table');
+        if (tableEl) {
+            ['displayed', 'filter', 'search', 'sort'].forEach(col => syncMasterCheckbox(tableEl, col));
+        }
     });
 
+    // Обработка любых изменений чекбоксов
     document.getElementById('tablesGrid')?.addEventListener('change', function (e) {
         const target = e.target;
         const tableEl = target.closest('table');
-        if (!tableEl) return;
+        const form = target.closest('form');
+        if (!tableEl || !form) return;
 
         if (target.classList.contains('js-toggle-col')) {
             const colName = target.dataset.col;
@@ -111,6 +149,78 @@
             target.indeterminate = false;
         } else if (target.dataset.colItem) {
             syncMasterCheckbox(tableEl, target.dataset.colItem);
+        }
+
+        updateDirtyState(form);
+    });
+
+    // AJAX-сохранение карточки
+    document.getElementById('tablesGrid')?.addEventListener('submit', async function (e) {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement)) return;
+
+        e.preventDefault();
+
+        const btn = form.querySelector('button[type="submit"]');
+
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.remove('btn-danger', 'text-dark', 'fw-semibold');
+            btn.classList.add('btn-outline-primary');
+            btn.textContent = 'Сохранение...';
+        }
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Ошибка при сохранении');
+            }
+
+            // Обновляем эталонный снимок после успешного сохранения
+            form.dataset.initialState = getFormSnapshot(form);
+            form.classList.remove('border-danger', 'border-2');
+
+            if (btn) {
+                btn.classList.remove('btn-outline-primary', 'btn-outline-danger');
+                btn.classList.add('btn-success');
+                btn.textContent = '✓ Сохранено';
+
+                setTimeout(() => {
+                    btn.disabled = false;
+                    // Возвращаем актуальное состояние (если пользователь успел кликнуть что-то за эти 1.5 сек — снова станет жёлтой)
+                    updateDirtyState(form);
+                }, 1500);
+            }
+        } catch (err) {
+            console.error(err);
+            if (btn) {
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-outline-danger');
+                btn.textContent = 'Ошибка!';
+                btn.disabled = false;
+            }
+            alert('Не удалось сохранить настройки: ' + err.message);
+        }
+    });
+
+    // Предупреждение при попытке закрыть/обновить страницу, если остались несохранённые карточки
+    window.addEventListener('beforeunload', function (e) {
+        const hasUnsaved = Array.from(document.querySelectorAll('#tablesGrid form'))
+            .some(form => form.dataset.initialState !== undefined && getFormSnapshot(form) !== form.dataset.initialState);
+
+        if (hasUnsaved) {
+            e.preventDefault();
+            e.returnValue = '';
         }
     });
 {/literal}

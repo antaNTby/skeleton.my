@@ -144,7 +144,7 @@ class SchemaVisualizerController
     /**
      * POST /dev/schema-map/update
      */
-    public function update(): void
+    public function update_OLD(): void
     {
         $tableName = (string) ( $_POST['table'] ?? '' );
 
@@ -160,4 +160,55 @@ class SchemaVisualizerController
 
         Flight::redirect( '/dev/schema-map?synced=1' );
     }
+
+/**
+ * POST /dev/schema-map/update
+ */
+    public function update(): void
+    {
+        $tableName = (string) ( $_POST['table'] ?? '' );
+        $isAjax    = ( ( $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '' ) === 'XMLHttpRequest' )
+        || str_contains( $_SERVER['HTTP_ACCEPT'] ?? '', 'application/json' );
+
+        if ( $tableName === '' || !$this->schemaManager->has( $tableName ) ) {
+            if ( $isAjax ) {
+                Flight::json( ['success' => false, 'message' => 'Таблица не найдена'], 404 );
+
+                return;
+            }
+            Flight::redirect( '/dev/schema-map' );
+
+            return;
+        }
+
+        try {
+            $this->schemaManager->updateFieldSettings(
+                tableName: $tableName,
+                displayedFields: (array) ( $_POST['displayed_fields'] ?? [] ),
+                filterFields: (array) ( $_POST['filter_fields'] ?? [] ),
+                searchFields: (array) ( $_POST['search_fields'] ?? [] ),
+                sortFields: (array) ( $_POST['sort_fields'] ?? [] ),
+            );
+
+            if ( $isAjax ) {
+                Flight::json( [
+                    'success' => true,
+                    'table'   => $tableName,
+                    'message' => 'Настройки сохранены',
+                ] );
+
+                return;
+            }
+
+            Flight::redirect( '/dev/schema-map?synced=1' );
+        } catch ( \Throwable $e ) {
+            if ( $isAjax ) {
+                Flight::json( ['success' => false, 'message' => $e->getMessage()], 500 );
+
+                return;
+            }
+            throw $e;
+        }
+    }
+
 }

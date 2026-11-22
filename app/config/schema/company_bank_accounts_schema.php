@@ -57,11 +57,10 @@ return array (
     3 => 'bic',
     4 => 'bank_name',
     5 => 'currency',
-    6 => 'is_primary',
-    7 => 'is_active',
-    8 => 'note',
-    9 => 'created_at',
-    10 => 'updated_at',
+    6 => 'is_active',
+    7 => 'note',
+    8 => 'created_at',
+    9 => 'updated_at',
   ),
   'sort_fields' => 
   array (

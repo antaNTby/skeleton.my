@@ -11,7 +11,7 @@
                         полей: {$table.fields|count}
                     </span>
                 </div>
-                <button type="submit" class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size: 0.78rem;">
+                <button type="submit" class="btn btn-outline-light btn-sm py-0 px-2" style="font-size: 0.78rem;">
                     Сохранить
                 </button>
             </div>
