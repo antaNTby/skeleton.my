@@ -45,6 +45,7 @@ Flight::route( 'POST /dev/schema-map/sync', [SchemaVisualizerController::class, 
 
 Flight::route( 'GET /dev/schema-map', [SchemaVisualizerController::class, 'index'] );
 Flight::route( 'POST /dev/schema-map/sync', [SchemaVisualizerController::class, 'sync'] );
+Flight::route( 'POST /dev/schema-map/update', [SchemaVisualizerController::class, 'update'] );
 
 $router->group( '', function ( Router $router ) use ( $config ) {
     $router->get( '/', [HomeController::class, 'index'] );

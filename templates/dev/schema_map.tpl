@@ -1,6 +1,7 @@
 {extends file='layout.tpl.html'}
 {block FOOTER}{/block}
-{block CONTAINER}
+{block ASIDE}{/block}
+{block MAIN}
 <div class="py-3">
     {* Шапка с легендой и кнопкой пересинхронизации *}
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 pb-2 border-bottom">
@@ -30,75 +31,14 @@
             <input type="search" id="tableFilter" class="form-control form-control-sm" placeholder="Фильтр по названию таблицы...">
         </div>
     </div>
-    {* Сетка карточек таблиц на Bootstrap Grid *}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="tablesGrid">
-        {foreach $tables as $table}
-        <div class="col table-card-col" data-table="{$table.name|escape}">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center py-2">
-                    <span class="font-monospace fw-bold text-body">{$table.name|escape}</span>
-                    <span class="badge rounded-pill text-bg-light border text-body-secondary">
-                        полей: {$table.fields|count}
-                    </span>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-sm table-hover mb-0 font-monospace small">
-                        <tbody>
-                            {foreach $table.fields as $field}
-                            <tr>
-                                <td class="ps-3 py-1">
-                                    {$field|escape}
-                                    {if $field === $table.primaryKey}
-                                    <span class="badge text-bg-warning ms-1" title="Primary Key">PK</span>
-                                    {/if}
-                                    {if isset($table.fkColumns[$field])}
-                                    {if $table.fkColumns[$field] === 'foreign_key'}
-                                    <span class="badge text-bg-primary ms-1" title="Строгий FOREIGN KEY">FK</span>
-                                    {else}
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" title="Неявная связь *_id">ID</span>
-                                    {/if}
-                                    {/if}
-                                </td>
-                                <td class="pe-3 py-1 text-end">
-                                    <span class="fw-semibold text-body">{$table.fieldTypes[$field]|default:'mixed'|escape}</span>
-                                    <span class="text-body-secondary">({$table.sqlTypes[$field]|default:''|escape})</span>
-                                </td>
-                            </tr>
-                            {/foreach}
-                        </tbody>
-                    </table>
-                </div>
-                {if $table.relations}
-                <div class="card-footer bg-body-tertiary pt-2 pb-2">
-                    <div class="small fw-semibold text-body-secondary mb-1">
-                        Связи ({$table.relations|count}):
-                    </div>
-                    <div class="d-flex flex-wrap gap-1 font-monospace" style="font-size: 0.75rem;">
-                        {foreach $table.relations as $relName => $rel}
-                        {if $rel.type === 'hasMany'}
-                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle text-wrap text-start" title="Обратная связь (1:N)">
-                            hasMany: {$relName|escape} → {$rel.table|escape}.{$rel.foreign_key|escape}
-                        </span>
-                        {elseif ($rel.source|default:'') === 'implicit_id'}
-                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle text-wrap text-start" title="Неявная связь *_id (display: {$rel.display_field|default:'id'|escape})">
-                            belongsTo: {$relName|escape} → {$rel.table|escape} ({$rel.foreign_key|escape})
-                        </span>
-                        {else}
-                        <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle text-wrap text-start" title="Жёсткий FOREIGN KEY (display: {$rel.display_field|default:'id'|escape})">
-                            belongsTo: {$relName|escape} → {$rel.table|escape} ({$rel.foreign_key|escape})
-                        </span>
-                        {/if}
-                        {/foreach}
-                    </div>
-                </div>
-                {/if}
-            </div>
-        </div>
-        {/foreach}
-    </div>
+        {* Сетка карточек таблиц на Bootstrap Grid *}
+{block TABLES_GRID}
+{include file="dev/TABLES_GRID.tpl" }
+{/block}
 
     {* Блок 1: ER-диаграмма *}
-{*     <div class="card shadow-sm mb-4">
+
+    <div class="card shadow-sm mb-4">
         <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center py-2">
             <span class="fw-semibold">ER-диаграмма базы данных</span>
             <span class="badge text-bg-secondary">{$totalTables} табл.</span>
@@ -107,7 +47,8 @@
         <div class="card-body overflow-x-auto bg-white" id="collapseExample">
             <pre class="mermaid m-0">{$mermaidCode|escape}</pre>
         </div>
-    </div> *}
+    </div>
+
 
 
 </div>
@@ -123,6 +64,7 @@
     {$smarty.block.parent}
     <script src="/lib/mermaid/mermaid.min.js" nonce="{$nonce}"></script>
     <script nonce="{$nonce}">
+
         mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
@@ -137,5 +79,54 @@
                 col.classList.toggle('d-none', !name.includes(query));
             });
         });
+
     </script>
+
+<script nonce="{$nonce}">
+{literal}
+    function syncMasterCheckbox(tableEl, colName) {
+        const master = tableEl.querySelector('.js-toggle-col[data-col="' + colName + '"]');
+        const items  = Array.from(tableEl.querySelectorAll('input[data-col-item="' + colName + '"]'));
+        if (!master || items.length === 0) return;
+
+        const checkedCount = items.filter(cb => cb.checked).length;
+        master.checked = checkedCount === items.length;
+        master.indeterminate = checkedCount > 0 && checkedCount < items.length;
+    }
+
+    document.querySelectorAll('#tablesGrid table').forEach(tableEl => {
+        ['displayed', 'filter', 'search', 'sort'].forEach(col => syncMasterCheckbox(tableEl, col));
+    });
+
+    document.getElementById('tablesGrid')?.addEventListener('change', function (e) {
+        const target = e.target;
+        const tableEl = target.closest('table');
+        if (!tableEl) return;
+
+        if (target.classList.contains('js-toggle-col')) {
+            const colName = target.dataset.col;
+            tableEl.querySelectorAll('input[data-col-item="' + colName + '"]').forEach(cb => {
+                cb.checked = target.checked;
+            });
+            target.indeterminate = false;
+        } else if (target.dataset.colItem) {
+            syncMasterCheckbox(tableEl, target.dataset.colItem);
+        }
+    });
+{/literal}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {/block}

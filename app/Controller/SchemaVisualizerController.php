@@ -36,6 +36,7 @@ class SchemaVisualizerController
                 }
             }
 
+/*
             $tables[$tableName] = [
                 'name'            => $tableName,
                 'primaryKey'      => $schema->primaryKey,
@@ -48,6 +49,24 @@ class SchemaVisualizerController
                 'hasRelations'    => $schema->hasRelations,
                 'relations'       => $relations,
             ];
+*/
+
+// Внутри SchemaVisualizerController::index() при формировании $tables[$tableName]:
+            $tables[$tableName] = [
+                'name'         => $tableName,
+                'primaryKey'   => $schema->primaryKey,
+                'fields'       => $schema->fields,
+                'displayedMap' => array_flip( $schema->displayedFields ),
+                'filterMap'    => array_flip( $schema->filterFields ),
+                'searchMap'    => array_flip( $schema->searchFields ),
+                'sortMap'      => array_flip( $schema->sortFields ),
+                'fieldTypes'   => $schema->fieldTypes,
+                'sqlTypes'     => $schema->sqlTypes,
+                'fkColumns'    => $fkColumns,
+                'hasRelations' => $schema->hasRelations,
+                'relations'    => $relations,
+            ];
+
         }
 
         $this->smarty->assign( [
@@ -120,5 +139,25 @@ class SchemaVisualizerController
         }
 
         return implode( "\n", $lines );
+    }
+
+    /**
+     * POST /dev/schema-map/update
+     */
+    public function update(): void
+    {
+        $tableName = (string) ( $_POST['table'] ?? '' );
+
+        if ( $tableName !== '' && $this->schemaManager->has( $tableName ) ) {
+            $this->schemaManager->updateFieldSettings(
+                tableName: $tableName,
+                displayedFields: (array) ( $_POST['displayed_fields'] ?? [] ),
+                filterFields: (array) ( $_POST['filter_fields'] ?? [] ),
+                searchFields: (array) ( $_POST['search_fields'] ?? [] ),
+                sortFields: (array) ( $_POST['sort_fields'] ?? [] ),
+            );
+        }
+
+        Flight::redirect( '/dev/schema-map?synced=1' );
     }
 }

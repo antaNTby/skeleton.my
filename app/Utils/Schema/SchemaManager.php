@@ -124,13 +124,13 @@ class SchemaManager
             $filterFields    = $this->filterExistingFields( $existingSchema->filterFields, $fields );
             $searchFields    = $this->filterExistingFields( $existingSchema->searchFields, $fields );
             $sortFields      = $this->filterExistingFields( $existingSchema->sortFields, $fields );
-            $mergedRelations = array_merge( $existingSchema->relations, $relations );
+            // $mergedRelations = array_merge( $existingSchema->relations, $relations );
         } else {
             $displayedFields = $fields;
             $filterFields    = $fields;
             $searchFields    = $fields;
             $sortFields      = $fields;
-            $mergedRelations = $relations;
+            // $mergedRelations = $relations;
         }
 
 // Внутри syncTable() перед созданием new TableSchema(...):
@@ -141,19 +141,6 @@ class SchemaManager
             $existingSchema?->relations ?? [],
             $relations
         );
-
-        // $schema = new TableSchema(
-        //     tableName: $tableName,
-        //     primaryKey: $detectedPk,
-        //     fields: $fields,
-        //     displayedFields: $displayedFields,
-        //     filterFields: $filterFields,
-        //     searchFields: $searchFields,
-        //     sortFields: $sortFields,
-        //     fieldTypes: $fieldTypes,
-        //     sqlTypes: $sqlTypes,
-        //     relations: $mergedRelations,
-        // );
 
         $schema = new TableSchema(
             tableName: $tableName,
@@ -415,6 +402,30 @@ class SchemaManager
         }
 
         return $relations;
+    }
+
+/**
+ * Обновить пользовательские настройки полей (displayed, filter, search, sort) и сохранить в кэш
+ */
+    public function updateFieldSettings(
+        string $tableName,
+        array  $displayedFields,
+        array  $filterFields,
+        array  $searchFields,
+        array  $sortFields
+    ): TableSchema {
+        $schema = $this->get( $tableName );
+
+        // Фильтруем по реальным колонкам таблицы, чтобы исключить подмену значений в POST
+        $schema->displayedFields = $this->filterExistingFields( $displayedFields, $schema->fields );
+        $schema->filterFields    = $this->filterExistingFields( $filterFields, $schema->fields );
+        $schema->searchFields    = $this->filterExistingFields( $searchFields, $schema->fields );
+        $schema->sortFields      = $this->filterExistingFields( $sortFields, $schema->fields );
+
+        $this->saveToCache( $schema );
+        $this->schemas[$tableName] = $schema;
+
+        return $schema;
     }
 
 }
