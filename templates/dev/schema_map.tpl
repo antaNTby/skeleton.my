@@ -96,35 +96,46 @@
         </div>
         {/foreach}
     </div>
-</div>
-{* Блок 1: ER-диаграмма *}
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center py-2">
-        <span class="fw-semibold">ER-диаграмма базы данных</span>
-        <span class="badge text-bg-secondary">{$totalTables} табл.</span>
-    </div>
-    <div class="card-body overflow-x-auto bg-white">
-        <pre class="mermaid m-0">{$mermaidCode|escape}</pre>
-    </div>
+
+    {* Блок 1: ER-диаграмма *}
+{*     <div class="card shadow-sm mb-4">
+        <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center py-2">
+            <span class="fw-semibold">ER-диаграмма базы данных</span>
+            <span class="badge text-bg-secondary">{$totalTables} табл.</span>
+            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">HideDiagram</button>
+        </div>
+        <div class="card-body overflow-x-auto bg-white" id="collapseExample">
+            <pre class="mermaid m-0">{$mermaidCode|escape}</pre>
+        </div>
+    </div> *}
+
+
 </div>
 {/block}
-{block scripts}
-{$smarty.block.parent}
-<script src="/lib/mermaid/mermaid.min.js" nonce="{$nonce}"></script>
-<script nonce="{$nonce}">
-mermaid.initialize({
-        startOnLoad: true,
-        theme: 'default',
-        securityLevel: 'loose',
-        er: { useMaxWidth: false }
-});
 
-document.getElementById('tableFilter') ? .addEventListener('input', function(e) {
-        const query = e.target.value.toLowerCase().trim();
-        document.querySelectorAll('#tablesGrid .table-card-col').forEach(col => {
+
+
+
+
+
+
+{block SCRIPTS}
+    {$smarty.block.parent}
+    <script src="/lib/mermaid/mermaid.min.js" nonce="{$nonce}"></script>
+    <script nonce="{$nonce}">
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            er: { useMaxWidth: false }
+        });
+
+        document.getElementById('tableFilter')?.addEventListener('input', function (e) {
+            const query = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('#tablesGrid .table-card-col').forEach(col => {
                 const name = (col.dataset.table || '').toLowerCase();
                 col.classList.toggle('d-none', !name.includes(query));
+            });
         });
-});
-</script>
+    </script>
 {/block}
