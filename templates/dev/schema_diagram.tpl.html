@@ -1,0 +1,44 @@
+{extends file='layout.tpl.html'}
+{block FOOTER}{/block}
+{block ASIDE}{/block}
+{block MAIN}
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center py-2">
+            <span class="fw-semibold">ER-диаграмма базы данных</span>
+        <a class="btn-link link-offset-3 link-underline-opacity-10 link-underline-opacity-75-hover" aria-current="page" href="/dev/schema-map"><i class="bi bi-diagram-3"></i> Таблицы БД и связи </a>
+            <span class="badge text-bg-secondary">{$totalTables} табл.</span>
+        </div>
+        <div class="card-body overflow-x-auto bg-white" id="collapseExample">
+            <pre class="mermaid m-0">{$mermaidCode|escape}</pre>
+        </div>
+    </div>
+
+
+
+{/block}
+
+
+
+
+
+
+
+{block SCRIPTS}
+    {$smarty.block.parent}
+
+    <script src="/lib/mermaid/mermaid.min.js" nonce="{$nonce}"></script>
+
+    <script nonce="{$nonce}">
+    {literal}
+    mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    er: { useMaxWidth: false }
+    });
+    {/literal}
+
+    </script>
+
+{/block}

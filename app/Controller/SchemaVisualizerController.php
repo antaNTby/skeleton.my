@@ -36,20 +36,48 @@ class SchemaVisualizerController
                 }
             }
 
-/*
+// Внутри SchemaVisualizerController::index() при формировании $tables[$tableName]:
             $tables[$tableName] = [
-                'name'            => $tableName,
-                'primaryKey'      => $schema->primaryKey,
-                'fields'          => $schema->fields,
-                'displayedFields' => $schema->displayedFields,
-                'filterFields'    => $schema->filterFields,
-                'fieldTypes'      => $schema->fieldTypes,
-                'sqlTypes'        => $schema->sqlTypes,
-                'fkColumns'       => $fkColumns,
-                'hasRelations'    => $schema->hasRelations,
-                'relations'       => $relations,
+                'name'         => $tableName,
+                'primaryKey'   => $schema->primaryKey,
+                'fields'       => $schema->fields,
+                'displayedMap' => array_flip( $schema->displayedFields ),
+                'filterMap'    => array_flip( $schema->filterFields ),
+                'searchMap'    => array_flip( $schema->searchFields ),
+                'sortMap'      => array_flip( $schema->sortFields ),
+                'fieldTypes'   => $schema->fieldTypes,
+                'sqlTypes'     => $schema->sqlTypes,
+                'fkColumns'    => $fkColumns,
+                'hasRelations' => $schema->hasRelations,
+                'relations'    => $relations,
             ];
-*/
+
+        }
+
+        $this->smarty->assign( [
+            'pageTitle'   => 'Визуализация схемы БД и связей',
+            'mermaidCode' => $this->buildMermaidDiagram( $tables ),
+            'tables'      => $tables,
+            'totalTables' => count( $tables ),
+            'synced'      => isset( $_GET['synced'] ),
+        ] );
+
+        $this->smarty->display( 'dev/schema_map.tpl.html' );
+    }
+    public function diagram(): void
+    {
+        $schemas = $this->schemaManager->all();
+        $tables  = [];
+
+        foreach ( $schemas as $tableName => $schema ) {
+            $relations = $this->relationManager->forTable( $tableName );
+            $fkColumns = [];
+
+            foreach ( $relations as $rel ) {
+                if ( ( $rel['type'] ?? '' ) === 'belongsTo' && !empty( $rel['foreign_key'] ) ) {
+                    $fkColumns[$rel['foreign_key']] = $rel['source'] ?? 'foreign_key';
+                }
+            }
 
 // Внутри SchemaVisualizerController::index() при формировании $tables[$tableName]:
             $tables[$tableName] = [
@@ -77,7 +105,7 @@ class SchemaVisualizerController
             'synced'      => isset( $_GET['synced'] ),
         ] );
 
-        $this->smarty->display( 'dev/schema_map.tpl' );
+        $this->smarty->display( 'dev/schema_diagram.tpl.html' );
     }
 
     /**
