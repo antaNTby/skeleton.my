@@ -159,21 +159,6 @@ if ( $db instanceof SimplePdo ) {
     $container->singleton( SimplePdo::class, $db );
 }
 
-####  '__dict_banks',
-####  '__dict_opf',
-####  '_migrations',
-####  'audit_logs',
-####  'companies',
-####  'company_bank_accounts',
-####  'company_contacts',
-####  'company_employees',
-####  'invoices',
-####  'logs',
-####  'orders',
-####  'posts',
-####  'user_tokens',
-####  'users'
-
 $allowedTables = [
     '__dict_banks',
     '__dict_opf',
@@ -189,37 +174,12 @@ $allowedTables = [
     'audit_logs',
 ];
 
-/*
- **Обычное обновление после миграций БД** (обновятся `fields`, `field_types`, `sql_types`, удалятся исчезнувшие колонки, но **сохранятся** ваши ручные `displayed_fields`, `filter_fields`, `search_fields`, `sort_fields` и `relations`):
-  ```php
-  $this->schemaManager->syncAllTables(forceRefresh: true);
-  ```
-• Полный сброс схемы к дефолтному состоянию (если нужно затереть ручные правки и снова включить все поля таблицы):
-```php
-$this->schemaManager->syncAllTables(forceRefresh: true,  preserveCustom: false);
-```
-*/
-
 $container->singleton( RelationManager::class, function ( Container $c ) use ( $allowedTables ): RelationManager {
     return new RelationManager(
         db: $c->get( SimplePdo::class ),
         cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
         generateJson: false,
         allowedTables: $allowedTables,
-        autoSync: true,
-    );
-} );
-
-$container->singleton( RelationManager::class, function ( Container $c ) use ( $allowedTables ): RelationManager {
-    return new RelationManager(
-        db: $c->get( SimplePdo::class ),
-        cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
-        generateJson: false,
-        allowedTables: $allowedTables,
-        columnAliases: [
-            'seller' => 'companies',
-            'buyer'  => 'companies',
-        ],
         autoSync: true,
     );
 } );

@@ -5,7 +5,7 @@ declare ( strict_types = 1 );
 namespace App\Controller;
 
 use App\Model\MySubModel;
-use App\Utils\Schema\RelationManager;
+use App\Utils\Schema\RelationManager; // <-- Добавьте импорт вверху файла
 use App\Utils\Schema\SchemaManager;
 use flight\database\SimplePdo;
 use flight\Engine;
@@ -34,7 +34,8 @@ class MySubModelController
         SimplePdo $db,
         Route     $route,
         // <-- Добавили получение роута из контейнера
-        private readonly SchemaManager $schemaManager
+        private readonly SchemaManager   $schemaManager,
+        private readonly RelationManager $relationManager
 
     ) {
         $this->app       = $app;
@@ -52,8 +53,15 @@ class MySubModelController
 
     public function index(): void
     {
-        $subModel = new MySubModel( $this->db, $this->tableName );
-        $rows     = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
+        // $subModel = new MySubModel( $this->db, $this->tableName );
+        $subModel = new MySubModel(
+            $this->db,
+            $this->tableName,
+            $this->schemaManager,
+            $this->relationManager
+        );
+
+        $rows = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
         // dd( $rows );
 
         $this->_render( 'index', ['rows' => $rows] );
