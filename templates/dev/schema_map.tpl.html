@@ -144,7 +144,8 @@
         }
 
         try {
-            const response = await fetch(form.action, {
+            const actionUrl = (e.submitter && e.submitter.formAction) ? e.submitter.formAction : form.action;
+            const response = await fetch(actionUrl, {
                 method: 'POST',
                 body: new FormData(form),
                 headers: {

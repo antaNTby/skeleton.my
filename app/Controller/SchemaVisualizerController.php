@@ -239,4 +239,50 @@ class SchemaVisualizerController
         }
     }
 
+    /**
+     * POST /dev/schema-map/sync-table
+     */
+    public function syncTable(): void
+    {
+        $tableName = (string) ( $_POST['table'] ?? '' );
+        $isAjax    = ( ( $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '' ) === 'XMLHttpRequest' )
+        || str_contains( $_SERVER['HTTP_ACCEPT'] ?? '', 'application/json' );
+
+        if ( $tableName === '' || !$this->schemaManager->has( $tableName ) ) {
+            if ( $isAjax ) {
+                Flight::json( ['success' => false, 'message' => 'Таблица не найдена'], 404 );
+
+                return;
+            }
+            Flight::redirect( '/dev/schema-map' );
+
+            return;
+        }
+
+        try {
+            // Обновляем связи и структуру конкретной таблицы с сохранением ручных настроек
+            $this->relationManager->syncAll( preserveCustom: true );
+            $this->schemaManager->syncTable( $tableName, preserveCustom: true );
+
+            if ( $isAjax ) {
+                Flight::json( [
+                    'success' => true,
+                    'table'   => $tableName,
+                    'message' => "Таблица {$tableName} синхронизирована",
+                ] );
+
+                return;
+            }
+
+            Flight::redirect( '/dev/schema-map?synced=1' );
+        } catch ( \Throwable $e ) {
+            if ( $isAjax ) {
+                Flight::json( ['success' => false, 'message' => $e->getMessage()], 500 );
+
+                return;
+            }
+            throw $e;
+        }
+    }
+
 }

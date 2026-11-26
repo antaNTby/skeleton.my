@@ -44,6 +44,7 @@ use flight\net\Router;
 Flight::route( 'GET /dev/schema-map', [SchemaVisualizerController::class, 'index'] );
 Flight::route( 'GET /dev/schema-diagram', [SchemaVisualizerController::class, 'diagram'] );
 Flight::route( 'POST /dev/schema-map/sync', [SchemaVisualizerController::class, 'sync'] );
+Flight::route( 'POST /dev/schema-map/sync-table', [SchemaVisualizerController::class, 'syncTable'] );
 Flight::route( 'POST /dev/schema-map/update', [SchemaVisualizerController::class, 'update'] );
 
 $router->group( '', function ( Router $router ) use ( $config ) {
