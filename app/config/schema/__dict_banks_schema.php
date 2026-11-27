@@ -25,8 +25,11 @@ return array (
     1 => 'bank_name',
     2 => 'bic_code',
     3 => 'unp',
-    4 => 'phone_fax',
-    5 => 'website',
+    4 => 'address',
+    5 => 'phone_fax',
+    6 => 'website',
+    7 => 'is_deprecated',
+    8 => 'note',
   ),
   'filter_fields' => 
   array (
