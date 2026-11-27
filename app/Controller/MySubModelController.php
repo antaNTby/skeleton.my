@@ -5,6 +5,8 @@ declare ( strict_types = 1 );
 namespace App\Controller;
 
 use App\Model\MySubModel;
+use App\Utils\Schema\RelationManager; // <-- Добавьте импорт вверху файла
+use App\Utils\Schema\SchemaManager;
 use flight\database\SimplePdo;
 use flight\Engine;
 use flight\net\Request;
@@ -27,9 +29,13 @@ class MySubModelController
      * @param Engine<object> $app
      */
     public function __construct(
+
         Engine    $app,
         SimplePdo $db,
-        Route     $route // <-- Добавили получение роута из контейнера
+        Route     $route,
+        // <-- Добавили получение роута из контейнера
+        private readonly SchemaManager   $schemaManager,
+        private readonly RelationManager $relationManager
 
     ) {
         $this->app       = $app;
@@ -37,16 +43,26 @@ class MySubModelController
         $this->tableName = $route->params['table_name'] ?? '';
 
         // Здесь ваш код
-        bdump( 'Вы запросили таблицу: ' . htmlspecialchars( $this->tableName ) );
+    }
+
+    public function sync(): void
+    {
+        $allSchemas = $this->schemaManager->syncAllTables( forceRefresh: true );
+        Flight::json( ['synced' => array_keys( $allSchemas )] );
     }
 
     public function index(): void
     {
-        $subModel = new MySubModel( $this->db, $this->tableName );
-        $rows     = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
-        // dd( $rows );
+        // $subModel = new MySubModel( $this->db, $this->tableName );
+        $subModel = new MySubModel(
+            $this->db,
+            $this->tableName,
+            $this->schemaManager,
+            $this->relationManager
+        );
 
-        bdump( 'Список из таблицы: ' . htmlspecialchars( $this->tableName ), 'INDEX' );
+        $rows = $subModel->orderByColumn( 'id', 'ASC' )->findAll();
+        // dd( $rows );
 
         $this->_render( 'index', ['rows' => $rows] );
     }
@@ -75,18 +91,18 @@ class MySubModelController
         string $method = 'index',
         array  $data = []
     ): void {
-        $templateDir = TEMPLATE_DIR;
-        $template    = $this->tableName . '/' . $method;
+        $templateDir  = TEMPLATE_DIR;
+        $templateName = $this->tableName . '/' . $method;
         // Формируем полный физический путь к файлу шаблона.
-        $templatePath = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $templateDir . DIRECTORY_SEPARATOR . $template . '.tpl.html' );
+        $templatePath = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $templateDir . DIRECTORY_SEPARATOR . 'MySubs/' . $templateName . '.tpl.html' );
 
         // Проверяем, существует ли файл шаблона на диске
         if ( !is_file( $templatePath ) ) {
             // Если индивидуального шаблона для таблицы нет, переключаемся на default
-            $template = 'default/' . $method;
+            $templateName = 'MySubs/' . 'default/' . $method;
         }
-        bdump( $template, 'template' );
-        $this->app->renderSmarty( $template, ['template_data' => $data] );
+        bdump( $templateName, 'template' );
+        $this->app->renderSmarty( $templateName, ['template_data' => $data] );
 
     }
 

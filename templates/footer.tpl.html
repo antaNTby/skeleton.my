@@ -1,0 +1,83 @@
+<div class="container-fluid" style="max-width: 1900px;">
+    <div class="row user-select-none">
+        <div class="col-1">
+            <div class="dropup-center dropup" id="menuDevLinks">
+                <a href="#" class="dropdown-toggle d-flex align-items-center mb-0 px-2 text-danger" data-bs-toggle="dropdown" aria-expanded="false" aria-label="menu"><i class="bi bi-bookmark-star"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+{*                     <li>
+                            <a class="dropdown-item text-nowrap" aria-current="page" href="/dev/adminer.php?server={$myConfig.db.dbhost}&username={$myConfig.db.user}&db={$myConfig.db.dbname}" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-database-fill-exclamation"></i> adminer
+                            </a>
+                    </li> *}
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-nowrap" aria-current="page" href="/links/deleteExpiredTokens" rel="noopener noreferrer">
+                            <i class="bi bi-shield-slash"></i> Удалить протухшие токены
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a type="button" id="btnClearCacheSchema" href="/API/DEV/clear_cache_schema" rel="noopener noreferrer" class="dropdown-item text-nowrap" title="Сбросить кэшированные связи и типы данных таблиц">
+                            <i class="bi bi-trash3-fill text-bg-danger p-1"></i>
+                            <span class="d-none d-md-inline fw-lighter">Очистить кэш схем</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a type="button" id="btnClearCacheSubPages" href="/API/DEV/clear_cache_subpages" rel="noopener noreferrer" class="dropdown-item text-nowrap" title="Сбросить кэшированные SubPages">
+                            <i class="bi bi-trash3-fill text-bg-danger p-1"></i>
+                            <span class="d-none d-md-inline fw-lighter">Очистить кэш SubPages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a type="button" id="btnClearCacheSMARTY" href="/API/DEV/clear_cache_smarty" rel="noopener noreferrer" class="dropdown-item text-nowrap" title="Сбросить кэшированные SMARTY">
+                            <i class="bi bi-trash3-fill text-bg-danger p-1"></i>
+                            <span class="d-none d-md-inline fw-lighter">Очистить кэш SMARTY</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a type="button" id="btnClearCacheSchema" target="_blank" href="/API/DEV/debug/routes" rel="noopener noreferrer" class="dropdown-item text-nowrap" title="Показать роуты">
+                            <i class="bi bi-compass"></i>
+                            <span class="d-none d-md-inline fw-lighter">Показать роуты</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a type="button" id="btnClearCacheSchema" target="_blank" href="/API/DEV/debug/routes/check" rel="noopener noreferrer" class="dropdown-item text-nowrap" title="Показать роуты c проверкой">
+                            <i class="bi bi-compass text-primary-emphasis"></i>
+                            <span class="d-none d-md-inline fw-lighter">Показать роуты c проверкой</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a type="button" id="test-schema" target="_blank" href="/API/DEV/test-schema" rel="noopener noreferrer" class="dropdown-item text-nowrap" title="тестировать схему">
+                           TEST
+                            <span class="d-none d-md-inline fw-lighter">ТЕСТ схемы</span>
+                        </a>
+                    </li>
+ {*                    <li><a class="dropdown-item active" href="#" aria-current="page">Overview</a></li>
+                    <li><a class="dropdown-item" href="#">Inventory</a></li>
+                    <li><a class="dropdown-item" href="#">Customers</a></li>
+                    <li><a class="dropdown-item" href="#">Products</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Reports</a></li>
+                    <li><a class="dropdown-item" href="#">Analytics</a></li> *}
+                </ul>
+            </div>
+        </div>
+        <div class="col-10">
+            {$COPYRIGHT} Права принадлежат, тем кто за них борется. nonce:{$nonce}
+        </div>
+        <div class="col-1">
+            <button class="btn btn-outline-secondary btn-sm m-0 p-0 float-end" title="Show Menu" data-bs-toggle="offcanvas" href="#offcanvasSideMenu" role="button" aria-controls="offcanvasSideMenu">
+                <img class="mx-1 my-0" src="/lib/ico/apple-touch-icon.png" alt="nix.by" height="16px">
+            </button>
+        </div>
+    </div>
+</div>

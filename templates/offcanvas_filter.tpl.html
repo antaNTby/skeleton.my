@@ -1,0 +1,50 @@
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFilter" aria-labelledby="offcanvasTopLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasTopLabel">Filter</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body container-md">
+        <div class="card mb-4 filter-card">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Фильтры поиска</h5>
+            </div>
+            <div class="card-body">
+                <!-- Форма отправляет POST на текущий URL без параметров -->
+                <form action="" method="POST" class="needs-validation" id="filterForm">
+                    <!-- Сетка для элементов фильтра (по 3 или 4 в ряд в зависимости от экрана) -->
+                    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3 align-items-end">
+                        {$filter_elements_html}
+                    </div>
+                    <!-- Блок управляющих кнопок -->
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <!-- Ссылка сброса передает параметр clear_filters для очистки сессии -->
+                        <a href="?clear_filters=1" class="btn btn-outline-secondary">
+                            Сбросить всё
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            Применить фильтры
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{*
+Простой фильтр
+<input type="text" name="company_id" placeholder="Компания">
+<input type="text" name="name" placeholder="Название">
+<button type="submit">Фильтровать</button>
+С операторами
+<select name="filter_age_op">
+    <option value="=">=</option>
+    <option value=">">&gt;</option>
+    <option value="<">&lt;</option>
+</select>
+<input type="text" name="filter_age">
+<pre>
+    {$dataDPT|debug_print_var}
+    {$table_schema|json_encode:JSON_PRETTY_PRINT}
+    {$dataDPT|json_encode:JSON_PRETTY_PRINT}
+</pre>
+*}

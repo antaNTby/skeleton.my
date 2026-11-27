@@ -1,0 +1,28 @@
+{extends file="layout.tpl.html"}
+{block MAIN}
+<main class="col-xl-9 mt-0 mb-5 p-3 ms-sm-auto col-xxl-10 px-lg-4 text-bg-danger">
+    <article class="card shadow-sm">
+        <div class="h-50 my-5 by-5">
+            <div class="card shadow m-5 border-danger">
+                <div class="card-header text-danger">
+                    <img class="mx-1 my-0" src="/lib/ico/apple-touch-icon.png" alt="nix.by" height="24px">
+                    Страница не найдена
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mx-auto"> <strong class="text-bg-danger px-2 py-1 m-1 rounded">404</strong> Flight::notFound()</h5>
+                    {if $message}
+                    <hr>
+                    <p class="card-text">
+                        Сообщение об ошибке: {$message|default:"Сообщение об ошибке"}{/if}
+                    </p>
+                    {if $filename}
+                    <hr>
+                    <p class="card-text">
+                        Путь к файлу: {$filename|default:"Путь к файлу"}{/if}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </article>
+</main>
+{/block}

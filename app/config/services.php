@@ -16,6 +16,8 @@
 
 use App\Utils\Config;
 use App\Utils\DatabaseFactory;
+use App\Utils\Schema\RelationManager;
+use App\Utils\Schema\SchemaManager;
 use flight\Container;
 use flight\database\SimplePdo;
 use flight\debug\tracy\TracyExtensionLoader;
@@ -157,6 +159,41 @@ if ( $db instanceof SimplePdo ) {
     $container->singleton( SimplePdo::class, $db );
 }
 
+$allowedTables = [
+    '__dict_banks',
+    '__dict_opf',
+    'companies',
+    'company_bank_accounts',
+    'company_contacts',
+    'company_employees',
+    'orders',
+    'invoices',
+    'users',
+    'user_tokens',
+    'posts',
+    'audit_logs',
+];
+
+$container->singleton( RelationManager::class, function ( Container $c ) use ( $allowedTables ): RelationManager {
+    return new RelationManager(
+        db: $c->get( SimplePdo::class ),
+        cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
+        generateJson: false,
+        allowedTables: $allowedTables,
+        autoSync: true,
+    );
+} );
+
+$container->singleton( SchemaManager::class, function ( Container $c ) use ( $allowedTables ): SchemaManager {
+    return new SchemaManager(
+        db: $c->get( SimplePdo::class ),
+        relationManager: $c->get( RelationManager::class ),
+        cacheDir: CONFIG_DIR . DIRECTORY_SEPARATOR . 'Schema',
+        generateJson: false,
+        allowedTables: $allowedTables,
+        autoSync: true,
+    );
+} );
 $container->set( Route::class, function () use ( $app ) {
     return $app->router()->route( $app->request() );
 } );
@@ -180,4 +217,4 @@ $app->map( 'make', function (
 
 $session->set( 'test_sess', $nonce );
 
-bdump( $container );
+bdump( $container->get( SchemaManager::class, [] ) );

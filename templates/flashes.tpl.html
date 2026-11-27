@@ -1,0 +1,122 @@
+{assign var="flashes" value=Flight::session()->get('flash_messages')}
+
+{if $flashes}
+<div class="flash-container position-fixed bottom-0 start-50 translate-middle m-2" style="z-index: 1080; width:40ex!important;" id="flashContainer">
+
+
+    {foreach $flashes as $flash}
+        {* Маппинг иконок под типы Bootstrap *}
+        {if $flash.type == 'success'}{$icon = 'bi-check-circle'}
+        {elseif $flash.type == 'danger'}{$icon = 'bi-exclamation-octagon'}
+        {elseif $flash.type == 'warning'}{$icon = 'bi-exclamation-triangle'}
+        {elseif $flash.type == 'info'}{$icon = 'bi-info-circle'}
+        {elseif $flash.type == 'primary'}{$icon = 'bi-megaphone'}
+        {else}{$icon = 'bi-bell'}{/if}
+
+        <div class="alert alert-{$flash.type} alert-dismissible d-flex align-items-center shadow-lg user-select-none mb-2 animate-alert"
+             role="alert"  style="transition: transform 0.3s ease, opacity 0.3s ease;">{* *}
+            <i class="bi {$icon} fs-4 px-1 me-3 d-inline-block"></i>
+            <div class="flex-grow-1 fs-6 text-break fw-lighter">
+                {$flash.message}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {/foreach}
+
+    {* Кнопка "Закрыть всё" — показываем только если сообщений больше одного *}
+    {if count($flashes) > 1}
+    <div class="text-end mb-2" id="closeAllBtnWrap">
+        <button id="close-all-flashes-btn" type="button" class="btn btn-sm btn-light shadow-sm border fw-lighter opacity-75">
+            <i class="bi bi-x-lg text-danger"></i> Закрыть всё
+        </button>
+    </div>
+    {/if}
+
+
+</div>
+
+<script nonce="{$nonce}">
+    /**
+     * Просто удаляем весь контейнер целиком
+     */
+    window.closeAllFlashes = function() {
+        const container = document.getElementById('flashContainer');
+        if (container) {
+            // Добавляем класс затухания из Bootstrap для красоты
+            container.classList.add('fade');
+            // Удаляем из структуры страницы через 150мс
+            setTimeout(() => container.remove(), 150);
+        }
+    };
+
+    /**
+     * Авто-скрытие алертов по одному (по таймеру)
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('flashContainer');
+        if (!container) return;
+
+        const alerts = container.querySelectorAll('.alert');
+        alerts.forEach((alert, index) => {
+            setTimeout(() => {
+                // Если контейнер еще существует (его не удалили кнопкой)
+                if (alert && document.contains(alert)) {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        alert.remove();
+                        // Если это был последний алерт — удаляем и кнопку, и контейнер
+                        if (container.querySelectorAll('.alert').length === 0) {
+                            container.remove();
+                        }
+                    }, 150);
+                }
+            }, 777000 + (index * 1000));
+        });
+    });
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Находим кнопку по ID
+    const btn = document.getElementById('close-all-flashes-btn');
+    if (btn) {
+        // Вешаем событие клика программно (это разрешено CSP)
+        btn.addEventListener('click', function() {
+            window.closeAllFlashes();
+        });
+    }
+});
+
+
+
+
+
+</script>
+
+
+
+{* Очищаем сессию, чтобы уведомления не дублировались при обновлении страницы *}
+{* {assign var="tmp" value=Flight::session()->delete('flash_messages')} *}
+{* Вызываем наш плагин. Он удалит данные из сессии сразу после показа *}
+    {clear_session key="flash_messages"}
+
+{/if}
+
+<style>
+    /* Плавная анимация появления */
+    .animate-alert {
+        animation: slideInRight 0.4s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Наведение курсора останавливает "затухание" (визуальный эффект) */
+    .flash-container .alert:hover {
+        transform: scale(1.02);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+    }
+</style>

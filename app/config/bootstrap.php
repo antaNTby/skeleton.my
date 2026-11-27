@@ -23,13 +23,15 @@ $appDir      = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIR
 $configDir   = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/config' );
 $logsDir     = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/logs' );
 
+$configDirSmarty = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/config/smarty_config_dir' );
 $templateDir     = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'templates' );
 $compileDir      = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/cache/smarty/compile_dir' );
 $cacheDir        = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/cache/smarty/cache_dir' );
-$configDirSmarty = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/config/smarty_config_dir' );
+
+$schemaDir = str_replace( ['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . DIRECTORY_SEPARATOR . 'app/config/schema' );
 
 // Проверяем и создаём необходимые директории
-$directories = [$appDir, $configDir, $templateDir, $compileDir, $cacheDir, $configDirSmarty, $logsDir];
+$directories = [$appDir, $configDir, $templateDir, $compileDir, $cacheDir, $configDirSmarty, $logsDir, $schemaDir];
 foreach ( $directories as $directory ) {
     if ( !is_dir( $directory ) ) {
         if (
@@ -48,6 +50,8 @@ define( 'PROJECT_ROOT', $projectRoot );
 define( 'APP_DIR', $appDir );
 define( 'CONFIG_DIR', $configDir );
 
+define( 'SCHEMA_DIR', $schemaDir );
+
 define( 'TEMPLATE_DIR', $templateDir );
 define( 'COMPILE_DIR', $compileDir );
 define( 'CACHE_DIR', $cacheDir );
@@ -55,10 +59,6 @@ define( 'CONFIG_DIR_SMARTY', $configDirSmarty );
 define( 'LOGS_DIR', $logsDir );
 
 require PROJECT_ROOT . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-dump( __DIR__ );
-dump( PROJECT_ROOT );
-dump( APP_DIR );
 
 // Layer 1: .env / real environment (secrets + deploy overrides)
 Env::load( PROJECT_ROOT . DIRECTORY_SEPARATOR . '.env' );
