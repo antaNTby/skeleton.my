@@ -11,7 +11,7 @@
             "*.git*",
             "favicon.ico",
             ".htaccess",
-            "composer.lock",
+            // "composer.lock",
             ".env*",
             ".runway-config.json",
             "config_sample.php",

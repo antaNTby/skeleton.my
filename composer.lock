@@ -898,16 +898,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v5.9.0",
+            "version": "v5.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "d37716def381e7b0450ed1608f24045c18f67eba"
+                "reference": "0bf498be1fa80e71de6c0ad4cfb4b724e59ad21e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/d37716def381e7b0450ed1608f24045c18f67eba",
-                "reference": "d37716def381e7b0450ed1608f24045c18f67eba",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/0bf498be1fa80e71de6c0ad4cfb4b724e59ad21e",
+                "reference": "0bf498be1fa80e71de6c0ad4cfb4b724e59ad21e",
                 "shasum": ""
             },
             "require": {
@@ -962,7 +962,7 @@
             "support": {
                 "forum": "https://github.com/smarty-php/smarty/discussions",
                 "issues": "https://github.com/smarty-php/smarty/issues",
-                "source": "https://github.com/smarty-php/smarty/tree/v5.9.0"
+                "source": "https://github.com/smarty-php/smarty/tree/v5.9.1"
             },
             "funding": [
                 {
@@ -970,7 +970,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-16T10:13:43+00:00"
+            "time": "2026-11-27T09:56:25+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1226,93 +1226,6 @@
                 "source": "https://github.com/twbs/icons/tree/v1.13.2"
             },
             "time": "2026-10-08T17:11:52+00:00"
-<<<<<<< HEAD
-        },
-        {
-            "name": "vlucas/phpdotenv",
-            "version": "v5.8.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpdotenv/phpdotenv.git",
-                "reference": "ba37876e98122ca15151247ce1187d20ee8bf4e0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpdotenv/phpdotenv/zipball/ba37876e98122ca15151247ce1187d20ee8bf4e0",
-                "reference": "ba37876e98122ca15151247ce1187d20ee8bf4e0",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pcre": "*",
-                "graham-campbell/result-type": "^1.2",
-                "php": "^7.2.5 || ^8.0",
-                "phpoption/phpoption": "^1.10",
-                "symfony/polyfill-ctype": "^1.26",
-                "symfony/polyfill-mbstring": "^1.26",
-                "symfony/polyfill-php80": "^1.26"
-            },
-            "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.8.2",
-                "ext-filter": "*",
-                "phpunit/phpunit": "^8.5.34 || ^9.6.13 || ^10.4.2"
-            },
-            "suggest": {
-                "ext-filter": "Required to use the boolean validator."
-            },
-            "type": "library",
-            "extra": {
-                "bamarni-bin": {
-                    "bin-links": true,
-                    "forward-command": false
-                },
-                "branch-alias": {
-                    "dev-master": "5.8-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Dotenv\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
-                    "homepage": "https://github.com/GrahamCampbell"
-                },
-                {
-                    "name": "Vance Lucas",
-                    "email": "vance@vancelucas.com",
-                    "homepage": "https://github.com/vlucas"
-                }
-            ],
-            "description": "Loads environment variables from `.env` to `$_ENV` and `$_SERVER` automagically, and optionally to `getenv()`.",
-            "keywords": [
-                "dotenv",
-                "env",
-                "environment"
-            ],
-            "support": {
-                "issues": "https://github.com/phpdotenv/phpdotenv/issues",
-                "source": "https://github.com/phpdotenv/phpdotenv/tree/v5.8.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/GrahamCampbell",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/vlucas/phpdotenv",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-11-23T00:53:11+00:00"
-=======
->>>>>>> origin/master
         }
     ],
     "packages-dev": [

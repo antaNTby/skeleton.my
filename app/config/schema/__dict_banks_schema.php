@@ -21,15 +21,51 @@ return array (
   ),
   'displayed_fields' => 
   array (
+    0 => 'id',
+    1 => 'bank_name',
+    2 => 'bic_code',
+    3 => 'unp',
+    4 => 'address',
+    5 => 'phone_fax',
+    6 => 'website',
+    7 => 'is_deprecated',
+    8 => 'note',
   ),
   'filter_fields' => 
   array (
+    0 => 'id',
+    1 => 'bank_name',
+    2 => 'bic_code',
+    3 => 'unp',
+    4 => 'address',
+    5 => 'phone_fax',
+    6 => 'website',
+    7 => 'is_deprecated',
+    8 => 'note',
   ),
   'search_fields' => 
   array (
+    0 => 'id',
+    1 => 'bank_name',
+    2 => 'bic_code',
+    3 => 'unp',
+    4 => 'address',
+    5 => 'phone_fax',
+    6 => 'website',
+    7 => 'is_deprecated',
+    8 => 'note',
   ),
   'sort_fields' => 
   array (
+    0 => 'id',
+    1 => 'bank_name',
+    2 => 'bic_code',
+    3 => 'unp',
+    4 => 'address',
+    5 => 'phone_fax',
+    6 => 'website',
+    7 => 'is_deprecated',
+    8 => 'note',
   ),
   'field_types' => 
   array (
