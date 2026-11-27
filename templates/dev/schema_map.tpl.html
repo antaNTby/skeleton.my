@@ -57,7 +57,7 @@
 
 
 <script nonce="{$nonce}">
-{literal}
+{* {literal} *}
     // 1. Снимок состояния всех чекбоксов внутри конкретной формы
     function getFormSnapshot(form) {
         return Array.from(form.querySelectorAll('input[type="checkbox"][name]'))
@@ -69,21 +69,35 @@
     function updateDirtyState(form) {
         if (!form) return;
         const isDirty = getFormSnapshot(form) !== form.dataset.initialState;
-        const btn = form.querySelector('button[type="submit"]');
+        const btnSave = form.querySelector('button[type="submit"][data-operation="save"]');
+        const btnSync = form.querySelector('button[type="submit"][data-operation="sync-table"]');
 
         form.classList.toggle('border-danger', isDirty);
         form.classList.toggle('border-2', isDirty);
 
-        if (btn && !btn.disabled) {
+
+
+        if (btnSave && !btnSave.disabled) {
+
+            console.log(btnSave)
+
+
             if (isDirty) {
-                btn.classList.remove('btn-outline-light', 'btn-success', 'btn-outline-danger');
-                btn.classList.add('btn-danger', 'text-dark', 'fw-semibold');
-                btn.textContent = 'Сохранить';
+                btnSave.classList.remove('btn-outline-secondary');
+                btnSave.classList.add('btn-danger');
+                btnSave.textContent = 'Сохранить';
             } else {
-                btn.classList.remove('btn-danger', 'text-dark', 'fw-semibold', 'btn-outline-danger');
-                btn.classList.add('btn-outline-light');
-                btn.textContent = 'Сохранить';
+                btnSave.classList.remove('btn-danger');
+                btnSave.classList.add('btn-outline-secondary');
+                btnSave.textContent = 'Сохранить';
             }
+
+
+                btnSync.classList.remove('btn-danger');
+                btnSync.classList.add('btn-outline-secondary');
+                // btnSync.textContent = '↻ Обновить';
+
+
         }
     }
 
@@ -142,13 +156,18 @@ document.getElementById('tablesGrid')?.addEventListener('submit', async function
     const btn = submitter || form.querySelector('button[type="submit"]');
     const originalText = btn ? btn.textContent : 'Сохранить';
 
+        const btnSave = form.querySelector('button[type="submit"][data-operation="save"]');
+        const btnSync = form.querySelector('button[type="submit"][data-operation="sync-table"]');
+
     if (btn) {
+
         btn.disabled = true;
-        btn.classList.remove('btn-warning', 'text-dark', 'fw-semibold');
-        btn.textContent = isSyncAction ? '...' : 'Сохранение...';
+        btn.classList.remove('btn-danger');
+        btn.textContent = isSyncAction ? 'Загружаю...' : 'Сохранение...';
     }
 
     try {
+         console.log([btn, isSyncAction]);
         const response = await fetch(actionUrl, {
             method: 'POST',
             body: new FormData(form),
@@ -174,28 +193,31 @@ document.getElementById('tablesGrid')?.addEventListener('submit', async function
         // Если нажимали пересинхронизацию таблицы — перезагружаем страницу, чтобы подтянуть новые колонки
         if (isSyncAction) {
             window.location.reload();
+                        btn.textContent = isSyncAction ?  '✓ Загружено' : '✓ Сохранено';
+
             return;
         }
 
         form.dataset.initialState = getFormSnapshot(form);
-        form.classList.remove('border-warning', 'border-2');
+        form.classList.remove('border-danger', 'border-2');
 
         if (btn) {
-            btn.classList.remove('btn-outline-primary', 'btn-outline-danger');
+            btn.classList.remove('btn-outline-secondary', 'btn-danger');
             btn.classList.add('btn-success');
-            btn.textContent = '✓ Сохранено';
+            btn.textContent = isSyncAction ?  '✓ Загружено' : '✓ Сохранено';
 
             setTimeout(() => {
                 btn.disabled = false;
+                btnSync.disabled = false;
                 updateDirtyState(form);
             }, 1500);
         }
     } catch (err) {
         console.error(err);
         if (btn) {
-            btn.classList.remove('btn-outline-primary', 'btn-outline-secondary');
-            btn.classList.add('btn-outline-danger');
-            btn.textContent = isSyncAction ? '!' : 'Ошибка!';
+            btn.classList.remove('btn-outline-secondary', 'btn-danger', 'btn-success');
+            btn.classList.add('btn-outline-danger',"text-capitalize");
+            btn.textContent = 'Ошибка!';
             btn.disabled = false;
         }
         alert('Не удалось выполнить операцию: ' + err.message);
@@ -213,7 +235,7 @@ document.getElementById('tablesGrid')?.addEventListener('submit', async function
             e.returnValue = '';
         }
     });
-{/literal}
+{* {/literal} *}
 </script>
 
 

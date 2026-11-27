@@ -54,10 +54,9 @@ return array (
     3 => 'address_text',
     4 => 'phone',
     5 => 'email',
-    6 => 'other',
-    7 => 'contact_person',
-    8 => 'is_primary',
-    9 => 'note',
+    6 => 'contact_person',
+    7 => 'is_primary',
+    8 => 'note',
   ),
   'sort_fields' => 
   array (
