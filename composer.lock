@@ -385,16 +385,16 @@
         },
         {
             "name": "flightphp/session",
-            "version": "v0.3.0",
+            "version": "v0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/flightphp/session.git",
-                "reference": "3d328a8961041a631133c9c9609300cabe8d9896"
+                "reference": "7050d778c36b770d5f5f2102ed8dd0127cd6012c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/flightphp/session/zipball/3d328a8961041a631133c9c9609300cabe8d9896",
-                "reference": "3d328a8961041a631133c9c9609300cabe8d9896",
+                "url": "https://api.github.com/repos/flightphp/session/zipball/7050d778c36b770d5f5f2102ed8dd0127cd6012c",
+                "reference": "7050d778c36b770d5f5f2102ed8dd0127cd6012c",
                 "shasum": ""
             },
             "require": {
@@ -436,9 +436,9 @@
             ],
             "support": {
                 "issues": "https://github.com/flightphp/session/issues",
-                "source": "https://github.com/flightphp/session/tree/v0.3.0"
+                "source": "https://github.com/flightphp/session/tree/v0.3.1"
             },
-            "time": "2025-06-21T19:54:01+00:00"
+            "time": "2026-11-25T18:08:03+00:00"
         },
         {
             "name": "flightphp/tracy-extensions",
@@ -1533,16 +1533,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v5.8.0",
+            "version": "v5.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpdotenv/phpdotenv.git",
-                "reference": "96149103e62ac67e915f6d2ef59b72dee2e011e0"
+                "reference": "ba37876e98122ca15151247ce1187d20ee8bf4e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpdotenv/phpdotenv/zipball/96149103e62ac67e915f6d2ef59b72dee2e011e0",
-                "reference": "96149103e62ac67e915f6d2ef59b72dee2e011e0",
+                "url": "https://api.github.com/repos/phpdotenv/phpdotenv/zipball/ba37876e98122ca15151247ce1187d20ee8bf4e0",
+                "reference": "ba37876e98122ca15151247ce1187d20ee8bf4e0",
                 "shasum": ""
             },
             "require": {
@@ -1601,7 +1601,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpdotenv/phpdotenv/issues",
-                "source": "https://github.com/phpdotenv/phpdotenv/tree/v5.8.0"
+                "source": "https://github.com/phpdotenv/phpdotenv/tree/v5.8.1"
             },
             "funding": [
                 {
@@ -1613,7 +1613,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-25T16:26:19+00:00"
+            "time": "2026-11-23T00:53:11+00:00"
         }
     ],
     "packages-dev": [
@@ -3401,16 +3401,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v8.1.10",
+            "version": "v8.1.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "3412a5af7d34a19515a77890fc804fe8e50d1a4f"
+                "reference": "f681b9e07afd027556e5b1eda96fcad5a27a2b98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/3412a5af7d34a19515a77890fc804fe8e50d1a4f",
-                "reference": "3412a5af7d34a19515a77890fc804fe8e50d1a4f",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/f681b9e07afd027556e5b1eda96fcad5a27a2b98",
+                "reference": "f681b9e07afd027556e5b1eda96fcad5a27a2b98",
                 "shasum": ""
             },
             "require": {
@@ -3464,7 +3464,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v8.1.10"
+                "source": "https://github.com/symfony/var-dumper/tree/v8.1.12"
             },
             "funding": [
                 {
@@ -3484,7 +3484,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-26T21:55:04+00:00"
+            "time": "2026-11-12T10:29:11+00:00"
         },
         {
             "name": "theseer/tokenizer",
