@@ -69,26 +69,16 @@
             .join('|');
     }
 
+    // Синхронизация общего чекбокса всей таблицы
+    function syncAllTableCheckbox(tableEl) {
+        const masterAll = tableEl.querySelector('.js-toggle-all');
+        const allItems  = Array.from(tableEl.querySelectorAll('input[data-col-item]'));
+        if (!masterAll || allItems.length === 0) return;
 
-
-// Синхронизация общего чекбокса всей таблицы
-function syncAllTableCheckbox(tableEl) {
-    const masterAll = tableEl.querySelector('.js-toggle-all');
-    const allItems  = Array.from(tableEl.querySelectorAll('input[data-col-item]'));
-    if (!masterAll || allItems.length === 0) return;
-
-    const checkedCount = allItems.filter(function (cb) { return cb.checked; }).length;
-    masterAll.checked = checkedCount === allItems.length;
-    masterAll.indeterminate = checkedCount > 0 && checkedCount < allItems.length;
-}
-
-
-
-
-
-
-
-
+        const checkedCount = allItems.filter(function (cb) { return cb.checked; }).length;
+        masterAll.checked = checkedCount === allItems.length;
+        masterAll.indeterminate = checkedCount > 0 && checkedCount < allItems.length;
+    }
 
     // 2. Проверка наличия несохранённых изменений и подсветка карточки/кнопки
     function updateDirtyState(form) {
@@ -262,11 +252,6 @@ function syncAllTableCheckbox(tableEl) {
             }
         });
     }
-
-
-
-
-
 
 
     // Предупреждение при попытке закрыть/обновить страницу, если остались несохранённые карточки
