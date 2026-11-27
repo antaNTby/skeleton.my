@@ -17,35 +17,16 @@ return array (
   ),
   'displayed_fields' => 
   array (
-    0 => 'id',
-    1 => 'short_name',
-    2 => 'full_name',
-    3 => 'custom_name',
-    4 => 'opf_type',
   ),
   'filter_fields' => 
   array (
-    0 => 'id',
-    1 => 'short_name',
-    2 => 'full_name',
-    3 => 'custom_name',
-    4 => 'opf_type',
   ),
   'search_fields' => 
   array (
-    0 => 'id',
-    1 => 'short_name',
-    2 => 'full_name',
-    3 => 'custom_name',
-    4 => 'opf_type',
+    0 => 'short_name',
   ),
   'sort_fields' => 
   array (
-    0 => 'id',
-    1 => 'short_name',
-    2 => 'full_name',
-    3 => 'custom_name',
-    4 => 'opf_type',
   ),
   'field_types' => 
   array (

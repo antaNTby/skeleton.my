@@ -36,22 +36,6 @@ return array (
       'foreign_key' => 'company_id',
       'owner_key' => 'id',
     ),
-    'contracts' => 
-    array (
-      'type' => 'hasMany',
-      'source' => 'foreign_key',
-      'table' => 'contracts',
-      'foreign_key' => 'buyer_id',
-      'owner_key' => 'id',
-    ),
-    'contractsasseller' => 
-    array (
-      'type' => 'hasMany',
-      'source' => 'foreign_key',
-      'table' => 'contracts',
-      'foreign_key' => 'seller_id',
-      'owner_key' => 'id',
-    ),
     'invoices' => 
     array (
       'type' => 'hasMany',
@@ -81,6 +65,22 @@ return array (
       'type' => 'hasMany',
       'source' => 'foreign_key',
       'table' => 'orders',
+      'foreign_key' => 'seller_id',
+      'owner_key' => 'id',
+    ),
+    'contracts' => 
+    array (
+      'type' => 'hasMany',
+      'source' => 'foreign_key',
+      'table' => 'contracts',
+      'foreign_key' => 'buyer_id',
+      'owner_key' => 'id',
+    ),
+    'contractsasseller' => 
+    array (
+      'type' => 'hasMany',
+      'source' => 'foreign_key',
+      'table' => 'contracts',
       'foreign_key' => 'seller_id',
       'owner_key' => 'id',
     ),

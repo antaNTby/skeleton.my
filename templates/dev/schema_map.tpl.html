@@ -56,14 +56,39 @@
     </script>
 
 
+
+{*  *}
 <script nonce="{$nonce}">
-{* {literal} *}
+{literal}
     // 1. Снимок состояния всех чекбоксов внутри конкретной формы
     function getFormSnapshot(form) {
         return Array.from(form.querySelectorAll('input[type="checkbox"][name]'))
-            .map(cb => cb.name + ':' + cb.value + '=' + (cb.checked ? '1' : '0'))
+            .map(function (cb) {
+                return cb.name + ':' + cb.value + '=' + (cb.checked ? '1' : '0');
+            })
             .join('|');
     }
+
+
+
+// Синхронизация общего чекбокса всей таблицы
+function syncAllTableCheckbox(tableEl) {
+    const masterAll = tableEl.querySelector('.js-toggle-all');
+    const allItems  = Array.from(tableEl.querySelectorAll('input[data-col-item]'));
+    if (!masterAll || allItems.length === 0) return;
+
+    const checkedCount = allItems.filter(function (cb) { return cb.checked; }).length;
+    masterAll.checked = checkedCount === allItems.length;
+    masterAll.indeterminate = checkedCount > 0 && checkedCount < allItems.length;
+}
+
+
+
+
+
+
+
+
 
     // 2. Проверка наличия несохранённых изменений и подсветка карточки/кнопки
     function updateDirtyState(form) {
@@ -75,29 +100,21 @@
         form.classList.toggle('border-danger', isDirty);
         form.classList.toggle('border-2', isDirty);
 
-
-
         if (btnSave && !btnSave.disabled) {
-
-            console.log(btnSave)
-
-
+            btnSave.classList.remove('btn-success', 'btn-outline-danger');
             if (isDirty) {
                 btnSave.classList.remove('btn-outline-secondary');
                 btnSave.classList.add('btn-danger');
-                btnSave.textContent = 'Сохранить';
             } else {
                 btnSave.classList.remove('btn-danger');
                 btnSave.classList.add('btn-outline-secondary');
-                btnSave.textContent = 'Сохранить';
             }
+            btnSave.textContent = 'Сохранить';
+        }
 
-
-                btnSync.classList.remove('btn-danger');
-                btnSync.classList.add('btn-outline-secondary');
-                // btnSync.textContent = '↻ Обновить';
-
-
+        if (btnSync) {
+            btnSync.classList.remove('btn-danger', 'btn-success', 'btn-outline-danger');
+            btnSync.classList.add('btn-outline-secondary');
         }
     }
 
@@ -107,135 +124,164 @@
         const items  = Array.from(tableEl.querySelectorAll('input[data-col-item="' + colName + '"]'));
         if (!master || items.length === 0) return;
 
-        const checkedCount = items.filter(cb => cb.checked).length;
+        const checkedCount = items.filter(function (cb) { return cb.checked; }).length;
         master.checked = checkedCount === items.length;
         master.indeterminate = checkedCount > 0 && checkedCount < items.length;
     }
 
-    // Инициализация при загрузке страницы: запоминаем эталонное состояние каждой карточки
-    document.querySelectorAll('#tablesGrid form').forEach(form => {
+    // Инициализация при загрузке страницы
+    document.querySelectorAll('#tablesGrid form').forEach(function (form) {
         form.dataset.initialState = getFormSnapshot(form);
         const tableEl = form.querySelector('table');
         if (tableEl) {
-            ['displayed', 'filter', 'search', 'sort'].forEach(col => syncMasterCheckbox(tableEl, col));
-        }
-    });
-
-    // Обработка любых изменений чекбоксов
-    document.getElementById('tablesGrid')?.addEventListener('change', function (e) {
-        const target = e.target;
-        const tableEl = target.closest('table');
-        const form = target.closest('form');
-        if (!tableEl || !form) return;
-
-        if (target.classList.contains('js-toggle-col')) {
-            const colName = target.dataset.col;
-            tableEl.querySelectorAll('input[data-col-item="' + colName + '"]').forEach(cb => {
-                cb.checked = target.checked;
+            ['displayed', 'filter', 'search', 'sort'].forEach(function (col) {
+                syncMasterCheckbox(tableEl, col);
             });
-            target.indeterminate = false;
-        } else if (target.dataset.colItem) {
-            syncMasterCheckbox(tableEl, target.dataset.colItem);
+            syncAllTableCheckbox(tableEl);
         }
-
-        updateDirtyState(form);
     });
 
+    const tablesGrid = document.getElementById('tablesGrid');
 
+    if (tablesGrid) {
+        // Обработка любых изменений чекбоксов
 
-// AJAX-сохранение и пересинхронизация карточки
-document.getElementById('tablesGrid')?.addEventListener('submit', async function (e) {
-    const form = e.target;
-    if (!(form instanceof HTMLFormElement)) return;
+        tablesGrid.addEventListener('change', function (e) {
+            const target = e.target;
+            const tableEl = target.closest('table');
+            const form = target.closest('form');
+            if (!tableEl || !form) return;
 
-    e.preventDefault();
-
-    const submitter = e.submitter;
-    const actionUrl = submitter?.getAttribute('formaction') || form.getAttribute('action') || '/dev/schema-map/update';
-    const isSyncAction = actionUrl.includes('sync-table');
-    const btn = submitter || form.querySelector('button[type="submit"]');
-    const originalText = btn ? btn.textContent : 'Сохранить';
-
-        const btnSave = form.querySelector('button[type="submit"][data-operation="save"]');
-        const btnSync = form.querySelector('button[type="submit"][data-operation="sync-table"]');
-
-    if (btn) {
-
-        btn.disabled = true;
-        btn.classList.remove('btn-danger');
-        btn.textContent = isSyncAction ? 'Загружаю...' : 'Сохранение...';
-    }
-
-    try {
-         console.log([btn, isSyncAction]);
-        const response = await fetch(actionUrl, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+            if (target.classList.contains('js-toggle-all')) {
+                // Включаем/выключаем все чекбоксы строк и 4 колоночных мастер-чекбокса
+                tableEl.querySelectorAll('input[data-col-item]').forEach(function (cb) {
+                    cb.checked = target.checked;
+                });
+                tableEl.querySelectorAll('.js-toggle-col').forEach(function (master) {
+                    master.checked = target.checked;
+                    master.indeterminate = false;
+                });
+                target.indeterminate = false;
+            } else if (target.classList.contains('js-toggle-col')) {
+                const colName = target.dataset.col;
+                tableEl.querySelectorAll('input[data-col-item="' + colName + '"]').forEach(function (cb) {
+                    cb.checked = target.checked;
+                });
+                target.indeterminate = false;
+                syncAllTableCheckbox(tableEl);
+            } else if (target.dataset.colItem) {
+                syncMasterCheckbox(tableEl, target.dataset.colItem);
+                syncAllTableCheckbox(tableEl);
             }
+
+            updateDirtyState(form);
         });
 
-        // Проверяем, что сервер действительно вернул JSON, а не HTML-ошибку 404/405/500
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            const text = await response.text();
-            throw new Error('HTTP ' + response.status + ': ' + text.slice(0, 120));
-        }
+        // AJAX-сохранение и пересинхронизация карточки
+        tablesGrid.addEventListener('submit', async function (e) {
+            const form = e.target;
+            if (!(form instanceof HTMLFormElement)) return;
 
-        const result = await response.json();
+            e.preventDefault();
 
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || 'Ошибка при выполнении запроса');
-        }
+            const submitter = e.submitter || form.querySelector('button[type="submit"][data-operation="save"]');
+            const operation = submitter ? submitter.getAttribute('data-operation') : 'save';
+            const isSyncAction = operation === 'sync-table';
+            const actionUrl = (submitter && submitter.getAttribute('formaction'))
+                || form.getAttribute('action')
+                || '/dev/schema-map/update';
 
-        // Если нажимали пересинхронизацию таблицы — перезагружаем страницу, чтобы подтянуть новые колонки
-        if (isSyncAction) {
-            window.location.reload();
-                        btn.textContent = isSyncAction ?  '✓ Загружено' : '✓ Сохранено';
+            const btnSave = form.querySelector('button[type="submit"][data-operation="save"]');
+            const btnSync = form.querySelector('button[type="submit"][data-operation="sync-table"]');
 
-            return;
-        }
+            if (btnSave) btnSave.disabled = true;
+            if (btnSync) btnSync.disabled = true;
 
-        form.dataset.initialState = getFormSnapshot(form);
-        form.classList.remove('border-danger', 'border-2');
+            if (submitter) {
+                submitter.classList.remove('btn-danger', 'btn-outline-danger', 'btn-success');
+                submitter.classList.add('btn-outline-secondary');
+                submitter.textContent = isSyncAction ? 'Загружаю...' : 'Сохранение...';
+            }
 
-        if (btn) {
-            btn.classList.remove('btn-outline-secondary', 'btn-danger');
-            btn.classList.add('btn-success');
-            btn.textContent = isSyncAction ?  '✓ Загружено' : '✓ Сохранено';
+            try {
+                const response = await fetch(actionUrl, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
 
-            setTimeout(() => {
-                btn.disabled = false;
-                btnSync.disabled = false;
-                updateDirtyState(form);
-            }, 1500);
-        }
-    } catch (err) {
-        console.error(err);
-        if (btn) {
-            btn.classList.remove('btn-outline-secondary', 'btn-danger', 'btn-success');
-            btn.classList.add('btn-outline-danger',"text-capitalize");
-            btn.textContent = 'Ошибка!';
-            btn.disabled = false;
-        }
-        alert('Не удалось выполнить операцию: ' + err.message);
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    throw new Error('HTTP ' + response.status + ': ' + text.slice(0, 120));
+                }
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Ошибка при выполнении запроса');
+                }
+
+                // Сбрасываем флаг dirty до возможной перезагрузки, чтобы не сработал beforeunload
+                form.dataset.initialState = getFormSnapshot(form);
+                form.classList.remove('border-danger', 'border-2');
+
+                if (submitter) {
+                    submitter.classList.remove('btn-outline-secondary', 'btn-danger');
+                    submitter.classList.add('btn-success');
+                    submitter.textContent = isSyncAction ? '✓ Загружено' : '✓ Сохранено';
+                }
+
+                if (isSyncAction) {
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 400);
+                    return;
+                }
+
+                setTimeout(function () {
+                    if (btnSave) btnSave.disabled = false;
+                    if (btnSync) btnSync.disabled = false;
+                    updateDirtyState(form);
+                }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                if (btnSave) btnSave.disabled = false;
+                if (btnSync) btnSync.disabled = false;
+
+                if (submitter) {
+                    submitter.classList.remove('btn-outline-secondary', 'btn-danger', 'btn-success');
+                    submitter.classList.add('btn-outline-danger');
+                    submitter.textContent = 'Ошибка!';
+                }
+                alert('Не удалось выполнить операцию: ' + err.message);
+            }
+        });
     }
-});
+
+
+
+
+
 
 
     // Предупреждение при попытке закрыть/обновить страницу, если остались несохранённые карточки
     window.addEventListener('beforeunload', function (e) {
         const hasUnsaved = Array.from(document.querySelectorAll('#tablesGrid form'))
-            .some(form => form.dataset.initialState !== undefined && getFormSnapshot(form) !== form.dataset.initialState);
+            .some(function (form) {
+                return form.dataset.initialState !== undefined && getFormSnapshot(form) !== form.dataset.initialState;
+            });
 
         if (hasUnsaved) {
             e.preventDefault();
             e.returnValue = '';
         }
     });
-{* {/literal} *}
+{/literal}
 </script>
 
 
