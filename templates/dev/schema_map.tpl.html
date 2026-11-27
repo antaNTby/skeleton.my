@@ -127,65 +127,81 @@
         updateDirtyState(form);
     });
 
-    // AJAX-сохранение карточки
-    document.getElementById('tablesGrid')?.addEventListener('submit', async function (e) {
-        const form = e.target;
-        if (!(form instanceof HTMLFormElement)) return;
 
-        e.preventDefault();
 
-        const btn = form.querySelector('button[type="submit"]');
+// AJAX-сохранение и пересинхронизация карточки
+document.getElementById('tablesGrid')?.addEventListener('submit', async function (e) {
+    const form = e.target;
+    if (!(form instanceof HTMLFormElement)) return;
+
+    e.preventDefault();
+
+    const submitter = e.submitter;
+    const actionUrl = submitter?.getAttribute('formaction') || form.getAttribute('action') || '/dev/schema-map/update';
+    const isSyncAction = actionUrl.includes('sync-table');
+    const btn = submitter || form.querySelector('button[type="submit"]');
+    const originalText = btn ? btn.textContent : 'Сохранить';
+
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.remove('btn-warning', 'text-dark', 'fw-semibold');
+        btn.textContent = isSyncAction ? '...' : 'Сохранение...';
+    }
+
+    try {
+        const response = await fetch(actionUrl, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
+        // Проверяем, что сервер действительно вернул JSON, а не HTML-ошибку 404/405/500
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error('HTTP ' + response.status + ': ' + text.slice(0, 120));
+        }
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Ошибка при выполнении запроса');
+        }
+
+        // Если нажимали пересинхронизацию таблицы — перезагружаем страницу, чтобы подтянуть новые колонки
+        if (isSyncAction) {
+            window.location.reload();
+            return;
+        }
+
+        form.dataset.initialState = getFormSnapshot(form);
+        form.classList.remove('border-warning', 'border-2');
 
         if (btn) {
-            btn.disabled = true;
-            btn.classList.remove('btn-danger', 'text-dark', 'fw-semibold');
-            btn.classList.add('btn-outline-light');
-            btn.textContent = 'Сохранение...';
-        }
+            btn.classList.remove('btn-outline-primary', 'btn-outline-danger');
+            btn.classList.add('btn-success');
+            btn.textContent = '✓ Сохранено';
 
-        try {
-            const actionUrl = (e.submitter && e.submitter.formAction) ? e.submitter.formAction : form.action;
-            const response = await fetch(actionUrl, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(result.message || 'Ошибка при сохранении');
-            }
-
-            // Обновляем эталонный снимок после успешного сохранения
-            form.dataset.initialState = getFormSnapshot(form);
-            form.classList.remove('border-danger', 'border-2');
-
-            if (btn) {
-                btn.classList.remove('btn-outline-light', 'btn-outline-danger');
-                btn.classList.add('btn-success');
-                btn.textContent = '✓ Сохранено';
-
-                setTimeout(() => {
-                    btn.disabled = false;
-                    // Возвращаем актуальное состояние (если пользователь успел кликнуть что-то за эти 1.5 сек — снова станет жёлтой)
-                    updateDirtyState(form);
-                }, 1500);
-            }
-        } catch (err) {
-            console.error(err);
-            if (btn) {
-                btn.classList.remove('btn-outline-light');
-                btn.classList.add('btn-outline-danger');
-                btn.textContent = 'Ошибка!';
+            setTimeout(() => {
                 btn.disabled = false;
-            }
-            alert('Не удалось сохранить настройки: ' + err.message);
+                updateDirtyState(form);
+            }, 1500);
         }
-    });
+    } catch (err) {
+        console.error(err);
+        if (btn) {
+            btn.classList.remove('btn-outline-primary', 'btn-outline-secondary');
+            btn.classList.add('btn-outline-danger');
+            btn.textContent = isSyncAction ? '!' : 'Ошибка!';
+            btn.disabled = false;
+        }
+        alert('Не удалось выполнить операцию: ' + err.message);
+    }
+});
+
 
     // Предупреждение при попытке закрыть/обновить страницу, если остались несохранённые карточки
     window.addEventListener('beforeunload', function (e) {
